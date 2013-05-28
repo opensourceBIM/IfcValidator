@@ -1,11 +1,10 @@
 package org.bimserver.rgdchecker;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Date;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.interfaces.objects.SActionState;
 import org.bimserver.interfaces.objects.SExtendedData;
+import org.bimserver.interfaces.objects.SExtendedDataSchema;
 import org.bimserver.interfaces.objects.SFile;
 import org.bimserver.interfaces.objects.SLongActionState;
 import org.bimserver.interfaces.objects.SObjectType;
@@ -26,9 +25,11 @@ import org.bimserver.plugins.services.ServicePlugin;
 import org.bimserver.shared.PublicInterfaceNotFoundException;
 import org.bimserver.shared.exceptions.ServerException;
 import org.bimserver.shared.exceptions.UserException;
+import org.bimserver.validationreport.Type;
+import org.bimserver.validationreport.ValidationReport;
+import org.codehaus.jettison.json.JSONException;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 
 public class RgdBimNormCheckerPlugin extends ServicePlugin {
 
@@ -79,49 +80,55 @@ public class RgdBimNormCheckerPlugin extends ServicePlugin {
 		serviceDescriptor.setDescription("RGD BIM Norm Checker");
 		serviceDescriptor.setNotificationProtocol(AccessMethod.INTERNAL);
 		serviceDescriptor.setTrigger(Trigger.NEW_REVISION);
+		serviceDescriptor.setReadRevision(true);
+		final String schemaNamespace = "http://extend.bimserver.org/validationreport";
+		serviceDescriptor.setWriteExtendedData(schemaNamespace);
 		registerNewRevisionHandler(serviceDescriptor, new NewRevisionHandler() {
 			@Override
-			public void newRevision(BimServerClientInterface bimServerClientInterface, long poid, long roid, SObjectType settings) throws ServerException, UserException {
+			public void newRevision(BimServerClientInterface bimServerClientInterface, long poid, long roid, long soid, SObjectType settings) throws ServerException, UserException {
 				try {
 					Long topicId = bimServerClientInterface.getRegistry().registerProgressOnRevisionTopic(SProgressTopicType.RUNNING_SERVICE, poid, roid, "Running RGD BIM Norm Checker");
 					SLongActionState state = new SLongActionState();
+					Date startDate = new Date();
 					state.setProgress(-1);
 					state.setTitle("Bezig...");
 					state.setState(SActionState.FINISHED);
+					state.setStart(startDate);
 					bimServerClientInterface.getRegistry().updateProgressTopic(topicId, state);
-					
+					SExtendedDataSchema schema = bimServerClientInterface.getServiceInterface().getExtendedDataSchemaByNamespace(schemaNamespace);
+
 					IfcModelInterface model = bimServerClientInterface.getModel(poid, roid, true);
+
+					ValidationReport validationReport = new ValidationReport();
+					
+					validationReport.addHeader("Number of objects per type");
 					
 					int nrIfcProjects = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcProject());
 					int nrIfcSites = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcSite());
-					
-					StringBuilder builder = new StringBuilder();
-					builder.append(CharStreams.toString(new InputStreamReader(getPluginManager().getPluginContext(RgdBimNormCheckerPlugin.this).getResourceAsInputStream("templates/header.html"))));
-					builder.append("<tr><td>Exact 1 project</td><td>" + (nrIfcProjects == 1) + "</td></tr>");
-					builder.append("<tr><td>Exact 1 site</td><td>" + (nrIfcSites == 1) + "</td></tr>");
-					builder.append(CharStreams.toString(new InputStreamReader(getPluginManager().getPluginContext(RgdBimNormCheckerPlugin.this).getResourceAsInputStream("templates/footer.html"))));
+
+					validationReport.add(nrIfcProjects == 1 ? Type.SUCCESS : Type.ERROR, -1, "Number of projects", nrIfcProjects + " projects", "Exactly 1 IfcProject object");
+					validationReport.add(nrIfcProjects == 1 ? Type.SUCCESS : Type.ERROR, -1, "Number of sites", nrIfcSites + " sites", "Exactly 1 IfcSite object");
 					
 					SFile file = new SFile();
-					file.setMime("text/html");
-					file.setFilename("rgdbimnorm.html");
-					file.setData(builder.toString().getBytes(Charsets.UTF_8));
+					file.setMime("application/json; charset=utf-8");
+					file.setFilename("validationresults.json");
+					file.setData(validationReport.toJson().toString(2).getBytes(Charsets.UTF_8));
 					
-					bimServerClientInterface.getService().uploadFile(file);
+					file.setOid(bimServerClientInterface.getServiceInterface().uploadFile(file));
 					
 					SExtendedData extendedData = new SExtendedData();
-					extendedData.setTitle("RGD BIM Norm Report");
+					extendedData.setTitle("RGD BIM Norm Validation Report");
+					extendedData.setSchemaId(schema.getOid());
 					extendedData.setFileId(file.getOid());
 					
-					bimServerClientInterface.getService().addExtendedDataToRevision(roid, extendedData);
+					bimServerClientInterface.getServiceInterface().addExtendedDataToRevision(roid, extendedData);
 					
 					bimServerClientInterface.getRegistry().unregisterProgressTopic(topicId);
 				} catch (PublicInterfaceNotFoundException e1) {
 					e1.printStackTrace();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
 				} catch (BimServerClientException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
