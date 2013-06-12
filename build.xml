@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="RGDChecker" name="RGDChecker">
+	<target name="RGDChecker">
+		<mkdir dir="build" />
+		<mkdir dir="build/lib"/>
+		<copy todir="build/lib" failonerror="false">
+			<fileset dir="lib" />
+		</copy>
+		<copy todir="build/plugin">
+			<fileset dir="plugin" />
+		</copy>
+		<copy todir="build/templates">
+			<fileset dir="templates" />
+		</copy>
+		<javac destdir="build">
+			<src path="src"/>
+			<classpath>
+				<path>
+					<fileset dir="build/lib" />
+				</path>
+				<path>
+					<fileset dir="D:\Software\Workspaces\BIMserverPluginDev\BIMserverPluginBase\latest\lib" />
+					<fileset dir="D:\Software\Workspaces\BIMserverPluginDev\BIMserverPluginBase\latest\dep" />
+					<fileset dir="D:\Software\Workspaces\BIMserverPluginDev\BIMserverPluginBase\latest\plugins" />
+				</path>
+			</classpath>
+		</javac>
+		<jar destfile="rgdchecker.jar">
+			<fileset dir="build"></fileset>
+		</jar>
+		<delete dir="build" />
+	</target>
+</project>

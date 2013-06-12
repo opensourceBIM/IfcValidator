@@ -95,7 +95,7 @@ public class RgdBimNormCheckerPlugin extends ServicePlugin {
 					state.setState(SActionState.FINISHED);
 					state.setStart(startDate);
 					bimServerClientInterface.getRegistry().updateProgressTopic(topicId, state);
-					SExtendedDataSchema schema = bimServerClientInterface.getServiceInterface().getExtendedDataSchemaByNamespace(schemaNamespace);
+					SExtendedDataSchema schema = bimServerClientInterface.getBimsie1ServiceInterface().getExtendedDataSchemaByNamespace(schemaNamespace);
 
 					IfcModelInterface model = bimServerClientInterface.getModel(poid, roid, true);
 
