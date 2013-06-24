@@ -87,7 +87,8 @@ public class RgdBimNormCheckerPlugin extends ServicePlugin {
 			@Override
 			public void newRevision(BimServerClientInterface bimServerClientInterface, long poid, long roid, long soid, SObjectType settings) throws ServerException, UserException {
 				try {
-					Long topicId = bimServerClientInterface.getRegistry().registerProgressOnRevisionTopic(SProgressTopicType.RUNNING_SERVICE, poid, roid, "Running RGD BIM Norm Checker");
+					String title = "Running RGD BIM Norm Checker";
+					Long topicId = bimServerClientInterface.getRegistry().registerProgressOnRevisionTopic(SProgressTopicType.RUNNING_SERVICE, poid, roid, title);
 					SLongActionState state = new SLongActionState();
 					Date startDate = new Date();
 					state.setProgress(-1);
@@ -122,6 +123,14 @@ public class RgdBimNormCheckerPlugin extends ServicePlugin {
 					extendedData.setFileId(file.getOid());
 					
 					bimServerClientInterface.getBimsie1ServiceInterface().addExtendedDataToRevision(roid, extendedData);
+					
+					state = new SLongActionState();
+					state.setProgress(100);
+					state.setTitle(title);
+					state.setState(SActionState.FINISHED);
+					state.setStart(startDate);
+					state.setEnd(new Date());
+					bimServerClientInterface.getRegistry().updateProgressTopic(topicId, state);
 					
 					bimServerClientInterface.getRegistry().unregisterProgressTopic(topicId);
 				} catch (PublicInterfaceNotFoundException e1) {
