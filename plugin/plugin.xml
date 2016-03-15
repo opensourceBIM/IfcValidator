@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PluginDescriptor>
-	<PluginImplementation>
+	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
-		<implementationClass>org.bimserver.rgdchecker.RgdBimNormCheckerPlugin</implementationClass>
-	</PluginImplementation>
+		<implementationClass>org.bimserver.rvbchecker.RvbBimNormCheckerPlugin</implementationClass>
+		<description>RVB Norm 1.1 Checker</description>
+	</JavaPlugin>
 </PluginDescriptor>
