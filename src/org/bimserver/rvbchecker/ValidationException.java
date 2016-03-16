@@ -1,4 +1,4 @@
-package org.bimserver.rgdchecker;
+package org.bimserver.rvbchecker;
 
 public class ValidationException extends Exception {
 
