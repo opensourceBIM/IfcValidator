@@ -9,6 +9,9 @@ The plugin generates [Extended Data](https://github.com/opensourceBIM/BIMserver/
 
 For now, this plugin only implements checks that can be done with only the IFC file, so it will not read external files for cross-checking data.
 
+## TODO
+- Implement for IFC4 as well
+
 ## Checks
 
 A list of checks that have been identified by asking people from the building industry and reading Dutch "norm" documents that seem computer checkable.
