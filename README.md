@@ -31,6 +31,12 @@ A list of checks that have been identified by asking people from the building in
 | Building storeys naming according to RVB_BIM_Norm | Yes | RVB_BIM_Norm 1.1 |
 | [link]Building storeys with increasing numbers have increased center | Yes | RVB_BIM_Norm 1.1 |
 | All objects must be hierarchically structured to be in a building storey | Yes | RVB_BIM_Norm 1.1 |
+| Use a special "cube" to identify the origin of the model | No | |
+| Check whether the right Ifc entitities have been used | No | |
+| No use of IfcProxy | No | 
+| Every object should have some kind of identification | No |
+| No 2 objects can be modelled the same, be at the same place or represent the same thing | No |
+| Clash detection | No |
 
 ## Eample
 
