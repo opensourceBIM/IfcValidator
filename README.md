@@ -5,6 +5,8 @@ This is a BIMserver plugin that checks Ifc2x3tc1 models for common requirements.
 
 > Note: This plugin needs BIMserver 1.5
 
+The plugin generates "Extended Data" according to the following [Validation Report](https://github.com/opensourceBIM/BIMserver-Repository/wiki/Validation-Report) format.
+
 ## Checks
 
 A list of checks that have been identified by asking people from the building industry and reading Dutch "norm" documents that seem computer checkable.
