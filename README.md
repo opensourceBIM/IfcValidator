@@ -18,6 +18,4 @@ A list of checks that have been identified by asking people from the building in
 | Area unit is in m2 | Yes | RVB_BIM_Norm |
 | IfcProject has a volume unit | Yes | RVB_BIM_Norm |
 | Volume unit is in m3 | Yes | RVB_BIM_Norm |
-
 | Exactly 1 IfcSite | Yes | RVB_BIM_Norm |
-| 
