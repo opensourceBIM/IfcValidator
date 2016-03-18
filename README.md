@@ -15,7 +15,7 @@ A list of checks that have been identified by asking people from the building in
 
 | Check | Implemented | Part of |
 | ------------- | ------------- | ----- | ------ | 
-| Exactly 1 IfcProject | !(https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Exactly 1 IfcProject | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
 | IfcProject has at least one representation where the TrueNorth attribute has been set | Yes | RVB_BIM_Norm 1.1 |
 | IfcProject has a length unit set | Yes | RVB_BIM_Norm 1.1 |
 | Length unit is either in Meters or Millimeters | Yes | RVB_BIM_Norm 1.1 |
