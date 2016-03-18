@@ -19,6 +19,15 @@ A list of checks that have been identified by asking people from the building in
 | IfcProject has a volume unit | Yes | RVB_BIM_Norm |
 | Volume unit is in m3 | Yes | RVB_BIM_Norm |
 | Exactly 1 IfcSite | Yes | RVB_BIM_Norm |
+| [Dutch]Kadastrale aanduidingen | Yes | RVB_BIM_Norm 1.1 2.2.7.2 |
+| IfcSite has lattitude | Yes | RVB_BIM_Norm 1.1 |
+| IfcSite has longitude | Yes | RVB_BIM_Norm 1.1 |
+| IfcSite has elevation | Yes | RVB_BIM_Norm 1.1 |
+| Has at least one IfcBuilding | Yes | RVB_BIM_Norm 1.1 |
+| Has at least one IfcBuildingStorey | Yes | RVB_BIM_Norm 1.1 |
+| Building storeys naming according to RVB_BIM_Norm | Yes | RVB_BIM_Norm |
+| [link]Building storeys with increasing numbers have increased center | Yes | RVB_BIM_Norm 1.1 |
+
 
 ## Eample
 
