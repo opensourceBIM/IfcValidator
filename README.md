@@ -24,10 +24,10 @@ A list of checks that have been identified by asking people from the building in
 | IfcSite has longitude | Yes | RVB_BIM_Norm 1.1 |
 | IfcSite has elevation | Yes | RVB_BIM_Norm 1.1 |
 | Has at least one IfcBuilding | Yes | RVB_BIM_Norm 1.1 |
-| Has at least one IfcBuildingStorey | Yes | RVB_BIM_Norm 1.1 |
+| Has at least one IfcBuildingStorey | Yes | RVB_BIM_Norm 1.1 2.2.7.4 |
 | Building storeys naming according to RVB_BIM_Norm | Yes | RVB_BIM_Norm |
 | [link]Building storeys with increasing numbers have increased center | Yes | RVB_BIM_Norm 1.1 |
-
+| All objects must be hierarchically structured to be in a building storey | Yes | RVB_BIM_Norm 1.1 |
 
 ## Eample
 
