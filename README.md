@@ -9,36 +9,39 @@ The plugin generates [Extended Data](https://github.com/opensourceBIM/BIMserver/
 
 For now, this plugin only implements checks that can be done with only the IFC file, so it will not read external files for cross-checking data.
 
+## TODO
+- Implement for IFC4 as well
+
 ## Checks
 
 A list of checks that have been identified by asking people from the building industry and reading Dutch "norm" documents that seem computer checkable.
 
 | Check | Implemented | Part of |
 | ------------- | ------------- | ----- | ------ | 
-| Exactly 1 IfcProject | Yes | RVB_BIM_Norm 1.1 |
-| IfcProject has at least one representation where the TrueNorth attribute has been set | Yes | RVB_BIM_Norm 1.1 |
-| IfcProject has a length unit set | Yes | RVB_BIM_Norm 1.1 |
-| Length unit is either in Meters or Millimeters | Yes | RVB_BIM_Norm 1.1 |
-| IfcProject has an area unit | Yes | RVB_BIM_Norm 1.1 |
-| Area unit is in m2 | Yes | RVB_BIM_Norm 1.1 |
-| IfcProject has a volume unit | Yes | RVB_BIM_Norm 1.1 |
-| Volume unit is in m3 | Yes | RVB_BIM_Norm 1.1 |
-| Exactly 1 IfcSite | Yes | RVB_BIM_Norm1.1 |
-| [Dutch]Kadastrale aanduidingen | Yes | RVB_BIM_Norm 1.1 2.2.7.2 |
-| IfcSite has lattitude | Yes | RVB_BIM_Norm 1.1 |
-| IfcSite has longitude | Yes | RVB_BIM_Norm 1.1 |
-| IfcSite has elevation | Yes | RVB_BIM_Norm 1.1 |
-| Has at least one IfcBuilding | Yes | RVB_BIM_Norm 1.1 |
-| Has at least one IfcBuildingStorey | Yes | RVB_BIM_Norm 1.1 2.2.7.4 |
-| Building storeys naming according to RVB_BIM_Norm | Yes | RVB_BIM_Norm 1.1 |
-| [link]Building storeys with increasing numbers have increased center | Yes | RVB_BIM_Norm 1.1 |
-| All objects must be hierarchically structured to be in a building storey | Yes | RVB_BIM_Norm 1.1 |
-| Use a special "cube" to identify the origin of the model | No | |
-| Check whether the right Ifc entitities have been used | No | |
-| No use of IfcProxy | No | 
-| Every object should have some kind of identification | No |
-| No 2 objects can be modelled the same, be at the same place or represent the same thing | No |
-| Clash detection | No |
+| Exactly 1 IfcProject | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcProject has at least one representation where the TrueNorth attribute has been set | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcProject has a length unit set | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Length unit is either in Meters or Millimeters | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcProject has an area unit | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Area unit is in m2 | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcProject has a volume unit | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Volume unit is in m3 | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Exactly 1 IfcSite | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm1.1 |
+| [Dutch]Kadastrale aanduidingen | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 2.2.7.2 |
+| IfcSite has lattitude | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcSite has longitude | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| IfcSite has elevation | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Has at least one IfcBuilding | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Has at least one IfcBuildingStorey | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 2.2.7.4 |
+| Building storeys naming according to RVB_BIM_Norm | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| [link]Building storeys with increasing numbers have increased center | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| All objects must be hierarchically structured to be in a building storey | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
+| Use a special "cube" to identify the origin of the model | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | |
+| Check whether the right Ifc entitities have been used | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | |
+| No use of IfcProxy | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | 
+| Every object should have some kind of identification | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) |
+| No 2 objects can be modelled the same, be at the same place or represent the same thing | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) |
+| Clash detection | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) |
 
 ## Eample
 
