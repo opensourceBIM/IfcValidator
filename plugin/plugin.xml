@@ -2,7 +2,8 @@
 <PluginDescriptor>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
-		<implementationClass>org.bimserver.rvbchecker.RvbBimNormCheckerPlugin</implementationClass>
-		<description>RVB Norm 1.1 Checker</description>
+		<implementationClass>org.bimserver.ifcvalidator.IfcValidatorPlugin</implementationClass>
+		<name>IFC Validator</name>
+		<description>Validates IFC models according to user defined settings</description>
 	</JavaPlugin>
 </PluginDescriptor>

@@ -1,4 +1,4 @@
-package org.bimserver.rvbchecker;
+package org.bimserver.ifcvalidator;
 
 public class ValidationException extends Exception {
 
