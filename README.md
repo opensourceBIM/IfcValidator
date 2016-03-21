@@ -45,7 +45,7 @@ A list of checks that have been identified by asking people from the building in
 
 ## Further explanations
 
-### Check whether the right Ifc entitities have been used based on geometric ratios
+### Geometric ratios
 
 ## Eample
 
