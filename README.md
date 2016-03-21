@@ -37,7 +37,7 @@ A list of checks that have been identified by asking people from the building in
 | [link]Building storeys with increasing numbers have increased center | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
 | All objects must be hierarchically structured to be in a building storey | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
 | Use a special "cube" to identify the origin of the model | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | |
-| [Check whether the right Ifc entitities have been used based on geometric ratios](#Geometric ratios) | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | |
+| [Check whether the right Ifc entitities have been used based on geometric ratios](#geometric-ratios) | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | |
 | No use of IfcProxy | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) | 
 | Every object should have some kind of identification | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) |
 | No 2 objects can be modelled the same, be at the same place or represent the same thing | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/exclamation.png) |
@@ -46,6 +46,10 @@ A list of checks that have been identified by asking people from the building in
 ## Further explanations
 
 ### Geometric ratios
+
+This check uses the geometry of an object to check whether the right IFC type has been used. For example, IfcSlab objects are usually flat surfaces that ware much wider then they are high. Columns are usually slender compared to their length etc...
+
+To be able to do these kind of comparisons it would be very useful to have oriented bounding boxes available (those are not available in BImserver at the moment).
 
 ## Eample
 
