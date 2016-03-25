@@ -23,10 +23,10 @@ public class ModelCheckerRegistry {
 		addCheck(new HasTrueNorthSet());
 
 		addCheck(new OnlyOneIfcSite());
-		addCheck(new IfcSiteElevation());
 		addCheck(new IfcSiteKadastaleAanduiding());
 		addCheck(new IfcSiteLatitude());
 		addCheck(new IfcSiteLongitude());
+		addCheck(new IfcSiteElevation());
 
 		addCheck(new AtLeastOneBuilding());
 

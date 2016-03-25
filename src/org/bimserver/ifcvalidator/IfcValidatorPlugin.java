@@ -94,8 +94,8 @@ public class IfcValidatorPlugin extends AbstractAddExtendedDataService {
 				ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
 
 				ParameterDefinition parameter = StoreFactory.eINSTANCE.createParameterDefinition();
-				parameter.setName(modelCheck.getName(translator));
 				parameter.setIdentifier(groupIdentifier + "___" + identifier);
+				parameter.setName(modelCheck.getName(translator));
 				parameter.setType(booleanType);
 				parameter.setRequired(true);
 				parameter.setDefaultValue(modelCheck.isEnabledByDefault() ? trueValue : falseValue);

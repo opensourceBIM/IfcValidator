@@ -20,7 +20,7 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 				checkKadastraleAanduidingen(ifcSite);
 				validationReport.add(Type.SUCCESS, ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
 			} catch (ValidationException e) {
-				validationReport.add(Type.ERROR, ifcSite.getOid(), "Kadastrale aanduiding", "Invalid", "Valid");
+				validationReport.add(Type.ERROR, ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
 			}
 		}
 	}
@@ -35,8 +35,10 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 				try {
 					Integer.parseInt(number);
 				} catch (NumberFormatException e) {
-					throw new ValidationException("perceelsnummer not a number");
+					throw new ValidationException("Kadastrale aanduiding - Perceelsnummer not a number");
 				}
+			} else {
+				throw new ValidationException("Kadastrale aanduiding - No spaces in name");
 			}
 		}
 	}
