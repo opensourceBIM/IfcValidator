@@ -14,6 +14,17 @@
 				<targetPath>plugin</targetPath>
 				<directory>plugin</directory>
 			</resource>
+			<resource>
+				<targetPath>templates</targetPath>
+				<directory>templates</directory>
+			</resource>
+			<resource>
+				<targetPath>/</targetPath>
+				<directory>.</directory>
+				<includes>
+					<include>*.properties</include>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
