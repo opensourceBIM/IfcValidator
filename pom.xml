@@ -22,7 +22,8 @@
 				<targetPath>/</targetPath>
 				<directory>.</directory>
 				<includes>
-					<include>*.properties</include>
+					<include>en.properties</include>
+					<include>nl.properties</include>
 				</includes>
 			</resource>
 		</resources>
