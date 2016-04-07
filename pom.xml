@@ -19,7 +19,7 @@
 				<directory>templates</directory>
 			</resource>
 			<resource>
-				<targetPath>/</targetPath>
+				<targetPath>.</targetPath>
 				<directory>.</directory>
 				<includes>
 					<include>en.properties</include>
