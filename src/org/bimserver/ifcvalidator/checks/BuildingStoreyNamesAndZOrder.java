@@ -52,37 +52,39 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 				validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Invalid building name, no spaces", ifcBuildingStorey.getName(), "");
 			}
 		}
-		double lastZ = -1;
-		boolean increasingWithHeight = true;
-		for (int number : mapped.keySet()) {
-			IfcBuildingStorey ifcBuildingStorey = mapped.get(number);
-			double minZ = Double.MAX_VALUE;
-			double maxZ = -Double.MAX_VALUE;
-			for (IfcProduct ifcProduct : IfcUtils.getChildren(ifcBuildingStorey)) {
-				GeometryInfo geometry = ifcProduct.getGeometry();
-				if (geometry != null) {
-					Vector3f min = geometry.getMinBounds();
-					Vector3f max = geometry.getMaxBounds();
-					if (min.getZ() < minZ) {
-						minZ = min.getZ();
-					}
-					if (max.getZ() > maxZ) {
-						maxZ = max.getZ();
+		if (mapped.size() > 1) {
+			double lastZ = -1;
+			boolean increasingWithHeight = true;
+			for (int number : mapped.keySet()) {
+				IfcBuildingStorey ifcBuildingStorey = mapped.get(number);
+				double minZ = Double.MAX_VALUE;
+				double maxZ = -Double.MAX_VALUE;
+				for (IfcProduct ifcProduct : IfcUtils.getChildren(ifcBuildingStorey)) {
+					GeometryInfo geometry = ifcProduct.getGeometry();
+					if (geometry != null) {
+						Vector3f min = geometry.getMinBounds();
+						Vector3f max = geometry.getMaxBounds();
+						if (min.getZ() < minZ) {
+							minZ = min.getZ();
+						}
+						if (max.getZ() > maxZ) {
+							maxZ = max.getZ();
+						}
 					}
 				}
+				double aabbCenterZ = minZ + (maxZ - minZ) / 2d;
+				IfcBuildingStorey lastStorey = null;
+				if (lastZ == -1 || aabbCenterZ > lastZ) {
+					lastZ = aabbCenterZ;
+					lastStorey = ifcBuildingStorey;
+				} else {
+					increasingWithHeight = false;
+					validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
+				}
 			}
-			double aabbCenterZ = minZ + (maxZ - minZ) / 2d;
-			IfcBuildingStorey lastStorey = null;
-			if (lastZ == -1 || aabbCenterZ > lastZ) {
-				lastZ = aabbCenterZ;
-				lastStorey = ifcBuildingStorey;
-			} else {
-				increasingWithHeight = false;
-				validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
-			}
+			if (increasingWithHeight) {
+				validationReport.add(Type.SUCCESS, -1, "Storeys seem to be increasing with z-value and naming", "", "");
+			}		
 		}
-		if (increasingWithHeight) {
-			validationReport.add(Type.SUCCESS, -1, "Storeys seem to be increasing with z-value and naming", "", "");
-		}		
 	}
 }
