@@ -6,6 +6,7 @@ import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.models.ifc2x3tc1.IfcBuilding;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
+import org.bimserver.models.ifc2x3tc1.IfcOpeningElement;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
 import org.bimserver.utils.IfcUtils;
@@ -23,7 +24,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 		boolean ok = true;
 		List<IfcProduct> products = model.getAllWithSubTypes(IfcProduct.class);
 		for (IfcProduct ifcProduct : products) {
-			if (ifcProduct instanceof IfcSite || ifcProduct instanceof IfcBuilding) {
+			if (ifcProduct instanceof IfcSite || ifcProduct instanceof IfcBuilding || ifcProduct instanceof IfcOpeningElement) {
 				continue;
 				// Skip
 			}
