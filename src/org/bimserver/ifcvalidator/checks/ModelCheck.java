@@ -26,6 +26,9 @@ public abstract class ModelCheck {
 	}
 	
 	public String getObjectIdentifier(IfcProduct ifcProduct) {
+		if (ifcProduct == null) {
+			return "No object";
+		}
 		String name = ifcProduct.getName();
 		if (name != null && !name.trim().equals("")) {
 			return name;

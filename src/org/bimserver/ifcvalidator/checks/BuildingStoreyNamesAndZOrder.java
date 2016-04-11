@@ -75,6 +75,7 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 			IfcBuildingStorey lastStorey = null;
 			if (lastZ == -1 || aabbCenterZ > lastZ) {
 				lastZ = aabbCenterZ;
+				lastStorey = ifcBuildingStorey;
 			} else {
 				increasingWithHeight = false;
 				validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
