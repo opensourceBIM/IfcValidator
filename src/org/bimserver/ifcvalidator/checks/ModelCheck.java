@@ -3,14 +3,15 @@ package org.bimserver.ifcvalidator.checks;
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
-import org.bimserver.validationreport.ValidationReport;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 
 public abstract class ModelCheck {
 
 	private String identifier;
 	private String groupIdentifier;
 
-	public abstract void check(IfcModelInterface model, ValidationReport validationReport, org.bimserver.ifcvalidator.Translator translator);
+	public abstract boolean check(IfcModelInterface model, IssueInterface issueInterface, org.bimserver.ifcvalidator.Translator translator) throws IssueException;
 
 	public String getIdentifier() {
 		return identifier;

@@ -11,8 +11,9 @@ import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.utils.IfcUtils;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
-import org.bimserver.validationreport.ValidationReport;
 
 public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 
@@ -21,11 +22,11 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 	}
 	
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
-		int nrBuildingStoreys = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuildingStorey());
-		validationReport.add(nrBuildingStoreys > 0 ? Type.SUCCESS : Type.ERROR, -1, "Number of building storeys", nrBuildingStoreys + " IfcBuildingStorey objects", "> 0 IfcBuildingStorey objects");
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+//		int nrBuildingStoreys = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuildingStorey());
+//		issueInterface.add(nrBuildingStoreys > 0 ? Type.SUCCESS : Type.ERROR, null, null, -1, "Number of building storeys", nrBuildingStoreys + " IfcBuildingStorey objects", "> 0 IfcBuildingStorey objects");
 		
-		// TODO check whether all objects are linked to storeys
+		boolean valid = true;
 		
 		Map<Integer, IfcBuildingStorey> mapped = new TreeMap<>();
 		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
@@ -39,17 +40,20 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 					} else {
 						int storeyNumber = Integer.parseInt(number);
 						if (mapped.containsKey(storeyNumber)) {
-							validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Duplicate storey name", ifcBuildingStorey.getName(), "");
+							issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Duplicate storey name", ifcBuildingStorey.getName(), "");
+							valid = false;
 						} else {
 							mapped.put(storeyNumber, ifcBuildingStorey);
-							validationReport.add(Type.SUCCESS, ifcBuildingStorey.getOid(), "Valid building name", ifcBuildingStorey.getName(), "");
+							issueInterface.add(Type.SUCCESS, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Valid building name", ifcBuildingStorey.getName(), "");
 						}
 					}
 				} catch (NumberFormatException e) {
-					validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Invalid building name, invalid number " + split[0], ifcBuildingStorey.getName(), "");
+					issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Invalid building name, invalid number " + split[0], ifcBuildingStorey.getName(), "");
+					valid = false;
 				}
 			} else {
-				validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Invalid building name, no spaces", ifcBuildingStorey.getName(), "");
+				issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Invalid building name, no spaces", ifcBuildingStorey.getName(), "");
+				valid = false;
 			}
 		}
 		if (mapped.size() > 1) {
@@ -79,12 +83,14 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 					lastStorey = ifcBuildingStorey;
 				} else {
 					increasingWithHeight = false;
-					validationReport.add(Type.ERROR, ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
+					issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
+					valid = false;
 				}
 			}
 			if (increasingWithHeight) {
-				validationReport.add(Type.SUCCESS, -1, "Storeys seem to be increasing with z-value and naming", "", "");
+				issueInterface.add(Type.SUCCESS, "Storeys seem to be increasing with z-value and naming", "", "");
 			}		
 		}
+		return valid;
 	}
 }

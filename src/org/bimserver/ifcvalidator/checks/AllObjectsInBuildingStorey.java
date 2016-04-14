@@ -10,17 +10,18 @@ import org.bimserver.models.ifc2x3tc1.IfcOpeningElement;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
 import org.bimserver.utils.IfcUtils;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
-import org.bimserver.validationreport.ValidationReport;
 
 public class AllObjectsInBuildingStorey extends ModelCheck {
 
 	public AllObjectsInBuildingStorey() {
-		super("BUILDINGSTOREY", "ALL_OBJECTS_IN_BUILDING_STOREY");
+		super("BUILDINGSTOREYS", "ALL_OBJECTS_IN_BUILDING_STOREY");
 	}
 
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
 		boolean ok = true;
 		List<IfcProduct> products = model.getAllWithSubTypes(IfcProduct.class);
 		for (IfcProduct ifcProduct : products) {
@@ -30,12 +31,14 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 			}
 			IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcProduct);
 			if (ifcBuildingStorey == null) {
-				validationReport.add(Type.ERROR, ifcProduct.getOid(), "Object " + getObjectIdentifier(ifcProduct) + " must be linked to a building storey", "None", "Building storey");
+				issueInterface.add(Type.ERROR, ifcProduct.eClass().getName(), ifcProduct.getGlobalId(), ifcProduct.getOid(), "Object " + getObjectIdentifier(ifcProduct) + " must be linked to a building storey", "None", "Building storey");
 				ok = false;
 			}
 		}
 		if (ok) {
-			validationReport.add(Type.SUCCESS, -1, "All objects (" + products.size() + ") must be linked to a building storey", "True", "True");
+			issueInterface.add(Type.SUCCESS, translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY"), translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY"), translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2"));
+			return true;
 		}
+		return false;
 	}
 }

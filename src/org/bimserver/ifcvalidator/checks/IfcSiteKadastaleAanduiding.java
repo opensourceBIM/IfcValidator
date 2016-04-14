@@ -1,11 +1,14 @@
 package org.bimserver.ifcvalidator.checks;
 
+import java.util.List;
+
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.ifcvalidator.ValidationException;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
-import org.bimserver.validationreport.ValidationReport;
 
 public class IfcSiteKadastaleAanduiding extends ModelCheck {
 
@@ -14,19 +17,26 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
-		for (IfcSite ifcSite : model.getAll(IfcSite.class)) {
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+		List<IfcSite> sites = model.getAll(IfcSite.class);
+		boolean valid = sites.size() > 0;
+		for (IfcSite ifcSite : sites) {
 			try {
 				checkKadastraleAanduidingen(ifcSite);
-				validationReport.add(Type.SUCCESS, ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
+				issueInterface.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
 			} catch (ValidationException e) {
-				validationReport.add(Type.ERROR, ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
+				issueInterface.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
+				valid = false;
 			}
 		}
+		return valid;
 	}
 	
 	private void checkKadastraleAanduidingen(IfcSite ifcSite) throws ValidationException {
 		String name = ifcSite.getName();
+		if (name == null) {
+			throw new ValidationException("No name");
+		}
 		String[] split = name.split("-");
 		for (String part : split) {
 			if (part.contains(" ")) {

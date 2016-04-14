@@ -15,23 +15,20 @@ import org.bimserver.models.store.ParameterDefinition;
 import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
 import org.bimserver.models.store.StoreFactory;
+import org.bimserver.models.store.StringType;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.services.AbstractAddExtendedDataService;
 import org.bimserver.plugins.services.BimServerClientInterface;
 import org.bimserver.shared.exceptions.PluginException;
-import org.bimserver.validationreport.ValidationReport;
+import org.bimserver.validationreport.IssueInterface;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-
-public class IfcValidatorPlugin extends AbstractAddExtendedDataService {
+public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService {
 
 	private final ModelCheckerRegistry modelCheckerRegistry;
-	private Translator translator;
 
-	public IfcValidatorPlugin() {
-		super("IFC Validator", "http://extend.bimserver.org/validationreport");
+	public AbstractIfcValidatorPlugin(String name, String namespace) {
+		super(name, namespace);
 		
 		modelCheckerRegistry = new ModelCheckerRegistry();
 	}
@@ -39,15 +36,9 @@ public class IfcValidatorPlugin extends AbstractAddExtendedDataService {
 	@Override
 	public void init(PluginContext pluginContext) throws PluginException {
 		super.init(pluginContext);
-		Path propertiesFile = pluginContext.getRootPath().resolve("en.properties");
-		Properties properties = new Properties();
-		try {
-			properties.load(Files.newInputStream(propertiesFile));
-			translator = new Translator(properties);
-		} catch (IOException e) {
-			throw new PluginException(e);
-		}
 	}
+	
+	protected abstract IssueInterface createIssueInterface(Translator translator);
 
 	@Override
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
@@ -55,26 +46,41 @@ public class IfcValidatorPlugin extends AbstractAddExtendedDataService {
 		
 		SProject project = bimServerClientInterface.getBimsie1ServiceInterface().getProjectByPoid(poid);
 		IfcModelInterface model = bimServerClientInterface.getModel(project, roid, true, false, true);
-		ValidationReport validationReport = new ValidationReport();
-
+		
 		PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
+
+		String language = pluginConfiguration.getString("LANGUAGE");
+		
+		String filename = language.toLowerCase() + ".properties";
+		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
+		Properties properties = new Properties();
+		properties.load(Files.newInputStream(propertiesFile));
+		Translator translator = new Translator(filename, properties);
+		
+		IssueInterface issueInterface = createIssueInterface(translator);
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
-			validationReport.addHeader(translator.translate(groupIdentifier + "_HEADER"));
+			issueInterface.addHeader(translator.translate(groupIdentifier + "_HEADER"));
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-						modelCheck.check(model, validationReport, translator);
+						boolean check = modelCheck.check(model, issueInterface, translator);
+						issueInterface.setCheckValid(fullIdentifier, check);
 					}
 				}
 			}
 		}
 		
-		addExtendedData(validationReport.toJson(new ObjectMapper()).toString().getBytes(Charsets.UTF_8), "validationresults.json", getTitle(), "application/json; charset=utf-8", bimServerClientInterface, roid);
+		issueInterface.validate();
+		
+		addExtendedData(issueInterface.getBytes(), getFileName(), getTitle(), getContentType(), bimServerClientInterface, roid);
 		
 		runningService.updateProgress(100);
 	}
+	
+	public abstract String getContentType();
+	public abstract String getFileName();
 	
 	@Override
 	public ObjectDefinition getSettingsDefinition() {
@@ -88,7 +94,32 @@ public class IfcValidatorPlugin extends AbstractAddExtendedDataService {
 
 		BooleanType trueValue = StoreFactory.eINSTANCE.createBooleanType();
 		trueValue.setValue(true);
-
+		
+		PrimitiveDefinition languageValue = StoreFactory.eINSTANCE.createPrimitiveDefinition();
+		languageValue.setType(PrimitiveEnum.STRING);
+		
+		StringType defaultLanguage = StoreFactory.eINSTANCE.createStringType();
+		defaultLanguage.setValue("EN");
+		
+		ParameterDefinition languageParameter = StoreFactory.eINSTANCE.createParameterDefinition();
+		languageParameter.setIdentifier("LANGUAGE");
+		languageParameter.setDescription("Language of the output");
+		languageParameter.setName("Language");
+		languageParameter.setType(languageValue);
+		languageParameter.setDefaultValue(defaultLanguage);
+		
+		objectDefinition.getParameters().add(languageParameter);
+		
+		String filename = "en.properties";
+		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
+		Properties properties = new Properties();
+		try {
+			properties.load(Files.newInputStream(propertiesFile));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Translator translator = new Translator(filename, properties);
+		
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);

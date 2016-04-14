@@ -19,7 +19,14 @@ public class ModelCheckerRegistry {
 	public ModelCheckerRegistry() {
 		addCheck(new OnlyOneIfcProject());
 
-		addCheck(new CheckUnits());
+		addCheck(new AtLeastOneBuilding());
+
+		addCheck(new AtLeastOneBuildingStorey());
+
+		addCheck(new CheckLengthUnit());
+		addCheck(new CheckAreaUnit());
+		addCheck(new CheckVolumeUnit());
+		
 		addCheck(new HasTrueNorthSet());
 
 		addCheck(new OnlyOneIfcSite());
@@ -28,7 +35,6 @@ public class ModelCheckerRegistry {
 		addCheck(new IfcSiteLongitude());
 		addCheck(new IfcSiteElevation());
 
-		addCheck(new AtLeastOneBuilding());
 
 		addCheck(new AllObjectsInBuildingStorey());
 		

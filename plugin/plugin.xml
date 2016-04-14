@@ -2,8 +2,20 @@
 <PluginDescriptor>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
-		<implementationClass>org.bimserver.ifcvalidator.IfcValidatorPlugin</implementationClass>
+		<implementationClass>org.bimserver.ifcvalidator.ValidationReportIfcValidatorPlugin</implementationClass>
 		<name>IFC Validator</name>
 		<description>Validates IFC models according to user defined settings</description>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifcvalidator.BcfIfcValidatorPlugin</implementationClass>
+		<name>IFC Validator (BCF)</name>
+		<description>Validates IFC models according to user defined settings, output as BCF</description>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifcvalidator.ExcelIfcValidatorPlugin</implementationClass>
+		<name>IFC Validator (Excel)</name>
+		<description>Validates IFC models according to user defined settings, output as Excel</description>
 	</JavaPlugin>
 </PluginDescriptor>

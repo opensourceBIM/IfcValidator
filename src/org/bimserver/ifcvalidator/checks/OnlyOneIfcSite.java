@@ -1,10 +1,13 @@
 package org.bimserver.ifcvalidator.checks;
 
+import java.util.List;
+
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
-import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
+import org.bimserver.models.ifc2x3tc1.IfcSite;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
-import org.bimserver.validationreport.ValidationReport;
 
 public class OnlyOneIfcSite extends ModelCheck {
 
@@ -13,8 +16,12 @@ public class OnlyOneIfcSite extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
-		int nrIfcSites = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcSite());
-		validationReport.add(nrIfcSites == 1 ? Type.SUCCESS : Type.ERROR, -1, "Number of sites", nrIfcSites + " sites", "Exactly 1 IfcSite object");
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+		List<IfcSite> sites = model.getAll(IfcSite.class);
+		IfcSite ifcSite = sites.size() == 1 ? sites.get(0) : null;
+		
+		issueInterface.add(sites.size() == 1 ? Type.SUCCESS : Type.ERROR, "IfcSite", ifcSite == null ? null : ifcSite.getGlobalId(), ifcSite == null ? null : ifcSite.getOid(), translator.translate("NUMBER_OF_SITES"), sites.size() + " " + translator.translate(sites.size() == 1 ? "SITE" : "SITES"), translator.translate("EXACTLY_ONE_SITE"));
+		
+		return sites.size() == 1;
 	}
 }

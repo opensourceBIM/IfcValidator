@@ -1,10 +1,13 @@
 package org.bimserver.ifcvalidator.checks;
 
+import java.util.List;
+
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
-import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
+import org.bimserver.models.ifc2x3tc1.IfcBuilding;
+import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
-import org.bimserver.validationreport.ValidationReport;
 
 public class AtLeastOneBuilding extends ModelCheck {
 
@@ -13,8 +16,12 @@ public class AtLeastOneBuilding extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
-		int nrBuildings = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuilding());
-		validationReport.add(nrBuildings > 0 ? Type.SUCCESS : Type.ERROR, -1, "Number of buildings", nrBuildings + " IfcBuilding objects", "> 0 IfcBuilding objects");
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+		List<IfcBuilding> buildings = model.getAll(IfcBuilding.class);
+		IfcBuilding building = buildings.size() == 1 ? buildings.get(0) : null;
+		
+		boolean valid = buildings.size() > 0;
+		issueInterface.add(valid ? Type.SUCCESS : Type.ERROR, building == null ? null : "IfcBuilding", building == null ? null : building.getGlobalId(), building == null ? null : building.getOid(), translator.translate("NUMBER_OF_BUILDINGS"), buildings.size() + " " + translator.translate(buildings.size() == 1 ? "BUILDING_OBJECT" : "BUILDING_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING"));
+		return valid;
 	}
 }

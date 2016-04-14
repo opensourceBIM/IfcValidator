@@ -6,8 +6,9 @@ import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.geometry.Vector3f;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSlab;
-import org.bimserver.validationreport.ValidationReport;
+import org.bimserver.validationreport.IssueInterface;
 
+// TODO
 public class CorrectUseOfIfcEntitities extends ModelCheck {
 
 	private static final int MAX_SLAB_THICKNESS_MM = 200;
@@ -17,10 +18,11 @@ public class CorrectUseOfIfcEntitities extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, ValidationReport validationReport, Translator translator) {
+	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) {
 		for (IfcSlab ifcSlab : model.getAll(IfcSlab.class)) {
 			ifcSlab.getGeometry().getMaxBounds();
 		}
+		return true;
 	}
 
 	private void checkHeightLessThenWidthOrDepth(IfcProduct ifcProduct) {

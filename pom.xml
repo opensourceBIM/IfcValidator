@@ -169,12 +169,22 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>pluginbase</artifactId>
-			<version>1.5.37</version>
+			<version>1.5.44-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.37</version>
+			<version>1.5.44-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>bcf</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
@@ -191,8 +201,8 @@
 		<url>https://github.com/opensourceBIM/IfcValidator.git</url>
 		<connection>scm:git:https://github.com/opensourceBIM/IfcValidator.git</connection>
 		<developerConnection>scm:git:https://github.com/opensourceBIM/IfcValidator.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<organization>
 		<name>OpenSource BIM</name>
 		<url>opensourcebim.org</url>
