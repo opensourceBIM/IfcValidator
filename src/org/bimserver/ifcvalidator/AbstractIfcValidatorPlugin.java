@@ -27,8 +27,8 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	private final ModelCheckerRegistry modelCheckerRegistry;
 
-	public AbstractIfcValidatorPlugin(String name, String namespace) {
-		super(name, namespace);
+	public AbstractIfcValidatorPlugin(String namespace) {
+		super(namespace);
 		
 		modelCheckerRegistry = new ModelCheckerRegistry();
 	}
@@ -44,7 +44,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
 		runningService.updateProgress(0);
 		
-		SProject project = bimServerClientInterface.getBimsie1ServiceInterface().getProjectByPoid(poid);
+		SProject project = bimServerClientInterface.getServiceInterface().getProjectByPoid(poid);
 		IfcModelInterface model = bimServerClientInterface.getModel(project, roid, true, false, true);
 		
 		PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
@@ -74,7 +74,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		
 		issueInterface.validate();
 		
-		addExtendedData(issueInterface.getBytes(), getFileName(), getTitle(), getContentType(), bimServerClientInterface, roid);
+		addExtendedData(issueInterface.getBytes(), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
 		
 		runningService.updateProgress(100);
 	}

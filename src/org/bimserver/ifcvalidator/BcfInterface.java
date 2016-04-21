@@ -2,6 +2,7 @@ package org.bimserver.ifcvalidator;
 
 import java.io.IOException;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.UUID;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -16,6 +17,9 @@ import org.opensourcebim.bcf.BcfException;
 import org.opensourcebim.bcf.BcfFile;
 import org.opensourcebim.bcf.BcfValidationException;
 import org.opensourcebim.bcf.TopicFolder;
+import org.opensourcebim.bcf.markup.Header;
+import org.opensourcebim.bcf.markup.Header.File;
+import org.opensourcebim.bcf.markup.Markup;
 
 public class BcfInterface implements IssueInterface {
 
@@ -33,8 +37,17 @@ public class BcfInterface implements IssueInterface {
 			TopicFolder topicFolder = bcfFile.createTopicFolder();
 			topicFolder.getTopic().setTitle(message);
 			topicFolder.getTopic().setGuid(UUID.randomUUID().toString());
-			topicFolder.getTopic().setCreationAuthor("");
+			topicFolder.getTopic().setCreationAuthor("Test");
 			topicFolder.setDefaultSnapShotToDummy();
+			
+			Markup markup = topicFolder.getMarkup();
+			Header header = new Header();
+			markup.setHeader(header);
+			List<File> files = header.getFile();
+			
+			File file = new File();
+			file.setIfcSpatialStructureElement(guid);
+			files.add(file);
 			
 			GregorianCalendar now = new GregorianCalendar();
 			try {

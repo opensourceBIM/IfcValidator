@@ -5,7 +5,7 @@ import org.bimserver.validationreport.IssueInterface;
 public class BcfIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public BcfIfcValidatorPlugin() {
-		super("IFC Validator (BCF)", "http://www.buildingsmart-tech.org/specifications/bcf-releases");
+		super("http://www.buildingsmart-tech.org/specifications/bcf-releases");
 	}
 
 	@Override
@@ -20,6 +20,6 @@ public class BcfIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	@Override
 	public String getFileName() {
-		return "validationresults.zip";
+		return "validationresults.bcfzip";
 	}
 }
