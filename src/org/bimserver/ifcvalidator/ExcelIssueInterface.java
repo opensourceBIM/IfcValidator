@@ -80,7 +80,7 @@ public class ExcelIssueInterface implements IssueInterface {
 			if (guid != null) {
 				sheet.addCell(new Label(2, row, guid, cellFormat));
 			} else {
-				if (oid == -1) {
+				if (oid == null || oid == -1) {
 					sheet.addCell(new Label(2, row, "", cellFormat));
 				} else {
 					sheet.addCell(new Label(2, row, "" + oid, cellFormat));
