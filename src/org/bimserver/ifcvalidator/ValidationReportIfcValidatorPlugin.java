@@ -6,7 +6,7 @@ import org.bimserver.validationreport.JsonValidationReport;
 public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public ValidationReportIfcValidatorPlugin() {
-		super("http://extend.bimserver.org/validationreport");
+		super("VALIDATION_JSON_1_0");
 	}
 
 	@Override

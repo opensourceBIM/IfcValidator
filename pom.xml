@@ -9,6 +9,7 @@
 	<description>BIMserver plugin that provides IFC validation services</description>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
 		<resources>
 			<resource>
 				<targetPath>plugin</targetPath>
@@ -168,18 +169,25 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
-			<artifactId>pluginbase</artifactId>
-			<version>1.5.73</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.73</version>
+			<version>1.5.66-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>bcf</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>ifcplugins</artifactId>
+			<version>0.0.19-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.opensourcebim</groupId>
+			<artifactId>tests</artifactId>
+			<version>1.5.66-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>

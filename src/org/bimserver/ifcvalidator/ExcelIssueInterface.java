@@ -137,4 +137,10 @@ public class ExcelIssueInterface implements IssueInterface {
 	public void add(Type messageType, String message, Object is, String shouldBe) throws IssueException {
 		add(messageType, null,  null,  null, message, is, shouldBe);
 	}
+
+	@Override
+	public boolean isValid() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

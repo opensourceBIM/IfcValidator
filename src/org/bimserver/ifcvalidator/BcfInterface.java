@@ -35,9 +35,9 @@ public class BcfInterface implements IssueInterface {
 			// Ignore, no SUCCESSES in BCF
 		} else if (messageType == Type.ERROR) {
 			TopicFolder topicFolder = bcfFile.createTopicFolder();
-			topicFolder.getTopic().setTitle(message);
-			topicFolder.getTopic().setGuid(UUID.randomUUID().toString());
-			topicFolder.getTopic().setCreationAuthor("Test");
+			topicFolder.getMarkup().getTopic().setTitle(message);
+			topicFolder.getMarkup().getTopic().setGuid(UUID.randomUUID().toString());
+			topicFolder.getMarkup().getTopic().setCreationAuthor("Test");
 			topicFolder.setDefaultSnapShotToDummy();
 			
 			Markup markup = topicFolder.getMarkup();
@@ -51,7 +51,7 @@ public class BcfInterface implements IssueInterface {
 			
 			GregorianCalendar now = new GregorianCalendar();
 			try {
-				topicFolder.getTopic().setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(now));
+				topicFolder.getMarkup().getTopic().setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(now));
 			} catch (DatatypeConfigurationException e) {
 				throw new IssueException(e);
 			}
@@ -92,5 +92,11 @@ public class BcfInterface implements IssueInterface {
 	@Override
 	public void add(Type messageType, String message, Object is, String shouldBe) throws IssueException {
 		add(messageType, null, null, null, message, is, shouldBe);
+	}
+
+	@Override
+	public boolean isValid() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -35,6 +35,8 @@ public class ModelCheckerRegistry {
 		addCheck(new IfcSiteLongitude());
 		addCheck(new IfcSiteElevation());
 
+		addCheck(new CarparkAccessability(new CarparkAccessibilityConfiguration()));
+		addCheck(new ExteriorWindowSizeSpaceRatio());
 
 		addCheck(new AllObjectsInBuildingStorey());
 		
