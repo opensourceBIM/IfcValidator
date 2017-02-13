@@ -170,7 +170,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.66-SNAPSHOT</version>
+			<version>1.5.67</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
@@ -180,13 +180,13 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>ifcplugins</artifactId>
-			<version>0.0.19-SNAPSHOT</version>
+			<version>0.0.18</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
-			<version>1.5.66-SNAPSHOT</version>
+			<version>1.5.67</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
