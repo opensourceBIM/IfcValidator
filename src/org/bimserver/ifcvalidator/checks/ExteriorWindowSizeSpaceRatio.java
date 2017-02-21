@@ -17,8 +17,11 @@ import org.bimserver.validationreport.Type;
 
 public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 
-	public ExteriorWindowSizeSpaceRatio() {
+	private WindowSpaceRatioConfiguration conf;
+
+	public ExteriorWindowSizeSpaceRatio(WindowSpaceRatioConfiguration conf) {
 		super("GEOMETRY", "RATIOS");
+		this.conf = conf;
 	}
 
 	@Override
@@ -46,10 +49,10 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 			if (ifcSpace.getGeometry() != null) {
-				if (totalWindowArea * 10 > ifcSpace.getGeometry().getArea()) {
-					issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio", totalWindowArea * 10, " > " + ifcSpace.getGeometry().getArea());
+				if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
+					issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio", totalWindowArea * conf.getRatio(), " > " + ifcSpace.getGeometry().getArea());
 				} else {
-					issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio", totalWindowArea * 10, " > " + ifcSpace.getGeometry().getArea());
+					issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio", totalWindowArea * conf.getRatio(), " > " + ifcSpace.getGeometry().getArea());
 				}
 			}
 		}
