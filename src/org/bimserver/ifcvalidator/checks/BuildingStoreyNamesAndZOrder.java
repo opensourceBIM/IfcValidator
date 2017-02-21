@@ -62,7 +62,7 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 				IfcBuildingStorey ifcBuildingStorey = mapped.get(number);
 				double minZ = Double.MAX_VALUE;
 				double maxZ = -Double.MAX_VALUE;
-				for (IfcProduct ifcProduct : IfcUtils.getChildren(ifcBuildingStorey)) {
+				for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 					GeometryInfo geometry = ifcProduct.getGeometry();
 					if (geometry != null) {
 						Vector3f min = geometry.getMinBounds();
