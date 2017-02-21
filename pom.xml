@@ -46,6 +46,16 @@
 									<type>xml</type>
 									<classifier>plugin</classifier>
 								</artifact>
+								<artifact>
+									<file>icon.png</file>
+									<type>png</type>
+									<classifier>icon</classifier>
+								</artifact>
+								<artifact>
+									<file>${project.build.outputDirectory}/plugin/version.properties</file>
+									<type>properties</type>
+									<classifier>version</classifier>
+								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>
@@ -180,7 +190,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>ifcplugins</artifactId>
-			<version>0.0.19-SNAPSHOT</version>
+			<version>0.0.21-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
