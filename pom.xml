@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opensourcebim</groupId>
 	<artifactId>ifcvalidator</artifactId>
-	<version>0.0.9-SNAPSHOT</version>
+	<version>0.0.9</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -202,7 +202,7 @@
 		<url>https://github.com/opensourceBIM/IfcValidator.git</url>
 		<connection>scm:git:https://github.com/opensourceBIM/IfcValidator.git</connection>
 		<developerConnection>scm:git:https://github.com/opensourceBIM/IfcValidator.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>ifcvalidator-0.0.9</tag>
 	</scm>
 	<organization>
 		<name>OpenSource BIM</name>
