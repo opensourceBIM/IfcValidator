@@ -69,7 +69,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 	@Override
 	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
 		Random random = new Random();
-		boolean debug = true;
+		boolean debug = false;
 		boolean removeAllWalls = true;
 		lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
 
