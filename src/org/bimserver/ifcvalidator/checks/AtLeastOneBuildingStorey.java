@@ -22,7 +22,7 @@ public class AtLeastOneBuildingStorey extends ModelCheck {
 		IfcBuildingStorey buildingStorey = size == 1 ? buildingStories.get(0) : null;
 		
 		boolean valid = size > 0;
-		issueInterface.add(valid ? Type.SUCCESS : Type.ERROR, buildingStorey == null ? null : "IfcBuildingStorey", buildingStorey == null ? null : buildingStorey.getGlobalId(), buildingStorey == null ? null : buildingStorey.getOid(), translator.translate("NUMBER_OF_BUILDING_STOREYS"), size + " " + translator.translate(size == 1 ? "BUILDING_OBJECT" : "BUILDING_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING_STOREY"));
+		issueInterface.add(valid ? Type.SUCCESS : Type.ERROR, buildingStorey == null ? null : "IfcBuildingStorey", buildingStorey == null ? null : buildingStorey.getGlobalId(), buildingStorey == null ? null : buildingStorey.getOid(), translator.translate("NUMBER_OF_BUILDING_STOREYS"), size + " " + translator.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING_STOREY"));
 		return valid;
 	}
 }

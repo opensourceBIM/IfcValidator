@@ -7,7 +7,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,17 +26,20 @@ import org.bimserver.models.ifc2x3tc1.IfcRelConnectsElements;
 import org.bimserver.models.ifc2x3tc1.IfcRelConnectsPathElements;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.models.ifc2x3tc1.IfcWall;
-import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
+import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.Type;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.Pseudograph;
 
 public class UnidentifiedSpaces extends ModelCheck {
+	private final Map<IfcProduct, Area> generatedAreas = new HashMap<>();
+	private float lengthUnitPrefix;
 
 	public UnidentifiedSpaces() {
 		super("SPACES", "UNIDENTIFIED");
@@ -52,10 +54,27 @@ public class UnidentifiedSpaces extends ModelCheck {
 		return ifcBuildingElementWrapper;
 	}
 	
+	private Area getOrCreateArea(IfcProduct ifcProduct, float multiplierMillimeters) {
+		Area area = generatedAreas.get(ifcProduct);
+		if (area == null) {
+			area = IfcTools2D.get2D(ifcProduct, multiplierMillimeters);
+			generatedAreas.put(ifcProduct, area);
+		}
+		if (area != null) {
+			return new Area(area);
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
 		Random random = new Random();
-		float lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
+		boolean debug = true;
+		boolean removeAllWalls = true;
+		lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
+
+		System.out.println(model.getAll(IfcRelConnectsPathElements.class).size() + " IfcRelConnectsPathElements found");
+
 		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
 			System.out.println(ifcBuildingStorey.getName());
 			
@@ -72,7 +91,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			Area totalArea = new Area();
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = IfcTools2D.get2D(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
 					if (area != null) {
 						totalArea.add(area);
 					}
@@ -84,15 +103,16 @@ public class UnidentifiedSpaces extends ModelCheck {
 			Map<IfcBuildingElement, IfcBuildingElementWrapper> mapping = new HashMap<>();
 			
 			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
-				if (ifcProduct instanceof IfcBuildingElement) {
+				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 					IfcBuildingElement ifcBuildingElement = (IfcBuildingElement)ifcProduct;
 					graph.addVertex(getOrCreateWrapper(mapping, ifcBuildingElement));
-					Area area = IfcTools2D.get2D(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
 					if (area != null) {
 						totalArea.add(area);
 					}
 				}
 			}
+			
 			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 					IfcElement ifcWall = ((IfcElement)ifcProduct);
@@ -112,6 +132,15 @@ public class UnidentifiedSpaces extends ModelCheck {
 					}
 				}
 			}
+
+			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
+				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
+					IfcBuildingElementWrapper wrapper = getOrCreateWrapper(mapping, (IfcBuildingElement) ifcProduct);
+					if (graph.edgesOf(wrapper).size() == 1) {
+						graph.removeVertex(wrapper);
+					}
+				}
+			}
 			
 			FindAllCyclesAlgo<IfcBuildingElementWrapper, IfcRelConnectsPathElements> algorighm = new FindAllCyclesAlgo<>(graph);
 			List<Set<IfcBuildingElementWrapper>> findSimpleCycles = algorighm.findAllCycles();
@@ -126,41 +155,48 @@ public class UnidentifiedSpaces extends ModelCheck {
 			affineTransform.translate(-totalArea.getBounds2D().getCenterX(), -totalArea.getBounds2D().getCenterY());
 
 			List<Set<IfcBuildingElementWrapper>> finalList = new ArrayList<>();
-			
-			for (Set<IfcBuildingElementWrapper> list : findSimpleCycles) {
-				Area cycleArea = new Area();
-				for (IfcBuildingElementWrapper ifcWallOutside : list) {
-					Area areaOutside = IfcTools2D.get2D(ifcWallOutside.get(), lengthUnitPrefix);
-					if (areaOutside != null) {
-						cycleArea.add(areaOutside);
-					}
-				}
-				
-				Area smallest = IfcTools2D.findSmallest(cycleArea);
 
+			Concurrent concurrent = new Concurrent(findSimpleCycles.size());
+			for (Set<IfcBuildingElementWrapper> list : findSimpleCycles) {
+				concurrent.run(new Runnable(){
+					public void run() {
+						Area cycleArea = new Area();
+						for (IfcBuildingElementWrapper ifcWallOutside : list) {
+							Area areaOutside = getOrCreateArea(ifcWallOutside.get(), lengthUnitPrefix);
+							if (areaOutside != null) {
+								cycleArea.add(areaOutside);
+							}
+						}
+						
+						Area smallest = IfcTools2D.findSmallest(cycleArea);
+						
 //				if (smallest != null) {
 //					graphics.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
 //					smallest.transform(affineTransform);
 //					graphics.fill(smallest);
 //				}
-
-				if (smallest != null) {
-					boolean foundCompleteFitting = false;
-					for (Set<IfcBuildingElementWrapper> insideList : findSimpleCycles) {
-						for (IfcBuildingElementWrapper ifcWallInside : insideList) {
-							Area areaInside = IfcTools2D.get2D(ifcWallInside.get(), lengthUnitPrefix);
-							if (areaInside != null) {
-								if (IfcTools2D.containsAllPoints(smallest, areaInside)) {
-									foundCompleteFitting = true;
+						
+						if (smallest != null) {
+							boolean foundCompleteFitting = false;
+							for (Set<IfcBuildingElementWrapper> insideList : findSimpleCycles) {
+								for (IfcBuildingElementWrapper ifcWallInside : insideList) {
+									Area areaInside = getOrCreateArea(ifcWallInside.get(), lengthUnitPrefix);
+									if (areaInside != null) {
+										if (IfcTools2D.containsAllPoints(smallest, areaInside)) {
+											foundCompleteFitting = true;
+										}
+									}
 								}
+							}
+							if (!foundCompleteFitting) {
+								finalList.add(list);
 							}
 						}
 					}
-					if (!foundCompleteFitting) {
-						finalList.add(list);
-					}
-				}
+				});
 			}
+			concurrent.await();
+			System.out.println("Final list: " + finalList.size());
 
 			Area checkArea = new Area();
 			for (Set<IfcBuildingElementWrapper> list : finalList) {
@@ -176,7 +212,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 //				}
 				Area cycleArea = new Area();
 				for (IfcBuildingElementWrapper ifcWall : list) {
-					Area area = IfcTools2D.get2D(ifcWall.get(), lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcWall.get(), lengthUnitPrefix);
 					if (area != null) {
 						cycleArea.add(area);
 					}
@@ -257,9 +293,19 @@ public class UnidentifiedSpaces extends ModelCheck {
 			
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = IfcTools2D.get2D(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
 					if (area != null) {
 						checkArea.subtract(area);
+					}
+				}
+			}
+			if (removeAllWalls) {
+				for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
+					if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
+						Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+						if (area != null) {
+							checkArea.subtract(area);
+						}
 					}
 				}
 			}
@@ -273,21 +319,21 @@ public class UnidentifiedSpaces extends ModelCheck {
 //				}
 //			}
 			
-			graphics.setColor(Color.BLUE);
+			graphics.setColor(Color.decode("#919DFF"));
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = IfcTools2D.get2D(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
 					if (area != null) {
 						area.transform(affineTransform);
 						graphics.fill(area);
 					}
 				}
 			}
-			graphics.setColor(Color.GREEN);
+			graphics.setColor(Color.decode("#A4FF9B"));
 			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 					IfcElement ifcWall = ((IfcElement)ifcProduct);
-					Area area = IfcTools2D.get2D(ifcWall, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcWall, lengthUnitPrefix);
 					if (area != null) {
 						area.transform(affineTransform);
 						graphics.fill(area);
@@ -295,24 +341,113 @@ public class UnidentifiedSpaces extends ModelCheck {
 				}
 			}
 
+			PathIterator pathIterator = checkArea.getPathIterator(null);
+			int nrErrors = 0;
+			Path2D.Float newPath = new Path2D.Float();
+			while (!pathIterator.isDone()) {
+				float[] coords = new float[6];
+				int currentSegment = pathIterator.currentSegment(coords);
+				if (currentSegment == PathIterator.SEG_CLOSE) {
+					newPath.closePath();
+					float area = Math.abs(IfcTools2D.getArea(new Area(newPath)));
+					if (area > 0.001) {
+						Issue issue = issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"", "", "");
+						BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, newPath);
+						issue.addImage(errorImage);
+						nrErrors++;
+					}
+					newPath = new Path2D.Float();
+				} else if (currentSegment == PathIterator.SEG_LINETO) {
+					newPath.lineTo(coords[0], coords[1]);
+				} else if (currentSegment == PathIterator.SEG_MOVETO) {
+					newPath.moveTo(coords[0], coords[1]);
+				} else {
+					System.out.println("Unimplemented segment" + currentSegment);
+				}
+				pathIterator.next();
+			}
+
+			if (nrErrors == 0) {
+				Issue issue = issueInterface.add(Type.SUCCESS, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"", "", "");
+				BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, null);
+				issue.addImage(errorImage);
+			}
+			
 			graphics.setColor(Color.RED);
 			checkArea.transform(affineTransform);
 			graphics.fill(checkArea);
 			
-			Display display = new Display(ifcBuildingStorey.getName(), 2000, 2000);
-			display.setImage(image);
+			if (debug) {
+				Display display = new Display(ifcBuildingStorey.getName(), 2000, 2000);
+				display.setImage(image);
+			}
 		}
-		
+
 		return false;
 	}
 	
+	private BufferedImage renderImage(IfcBuildingStorey ifcBuildingStorey, Area totalArea, Path2D.Float newPath) {
+		BufferedImage bufferedImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+		
+		int width = 800;
+		int height = 600;
+
+		AffineTransform flip = AffineTransform.getScaleInstance(-1, 1);
+		flip.translate(-width, 0);
+		graphics.transform(flip);
+
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, width, height);
+		
+		double scaleX = (width * 0.9) / totalArea.getBounds().getWidth();
+		double scaleY = (height * 0.9) / totalArea.getBounds().getHeight();
+		double scale = Math.min(scaleX, scaleY);
+		
+		AffineTransform affineTransform = new AffineTransform();
+		affineTransform.translate(width / 2f, height / 2f);
+		affineTransform.scale(scale, scale);
+		affineTransform.translate(-totalArea.getBounds2D().getCenterX(), -totalArea.getBounds2D().getCenterY());
+		
+		graphics.setColor(Color.decode("#919DFF"));
+		for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
+			if (ifcProduct instanceof IfcSpace) {
+				Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+				if (area != null) {
+					area.transform(affineTransform);
+					graphics.fill(area);
+				}
+			}
+		}
+		graphics.setColor(Color.decode("#A4FF9B"));
+		for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
+			if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
+				IfcElement ifcWall = ((IfcElement)ifcProduct);
+				Area area = getOrCreateArea(ifcWall, lengthUnitPrefix);
+				if (area != null) {
+					area.transform(affineTransform);
+					graphics.fill(area);
+				}
+			}
+		}
+		
+		if (newPath != null) {
+			graphics.setColor(Color.RED);
+			Area newArea = new Area(newPath);
+			newArea.transform(affineTransform);
+			graphics.fill(newArea);
+		}
+		
+		return bufferedImage;
+	}
+
 	private Area getInnerCurve(Area area) {
 		PathIterator pathIterator = area.getPathIterator(null);
 		if (area.isSingular()) {
 			System.out.println("Is singular");
 		} else {
-			Path2D.Double tmp = new Path2D.Double();
-			Path2D.Double smallest = new Path2D.Double();
+			Path2D.Float tmp = new Path2D.Float();
+			Path2D.Float smallest = new Path2D.Float();
 			Rectangle smallestRectangle = null;
 			while (!pathIterator.isDone()) {
 				double[] coords = new double[6];
@@ -327,7 +462,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 						smallestRectangle = tmp.getBounds();
 						smallest = tmp;
 					}
-					tmp = new Path2D.Double();
+					tmp = new Path2D.Float();
 				} else if (type == 1) {
 					tmp.lineTo(coords[0], coords[1]);
 				}
@@ -346,8 +481,8 @@ public class UnidentifiedSpaces extends ModelCheck {
 		if (area.isSingular()) {
 			System.out.println("Is singular");
 		} else {
-			Path2D.Double tmp = new Path2D.Double();
-			Path2D.Double largest = new Path2D.Double();
+			Path2D.Float tmp = new Path2D.Float();
+			Path2D.Float largest = new Path2D.Float();
 			Rectangle largestRectangle = null;
 			while (!pathIterator.isDone()) {
 				double[] coords = new double[6];
@@ -362,7 +497,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 						largestRectangle = tmp.getBounds();
 						largest = tmp;
 					}
-					tmp = new Path2D.Double();
+					tmp = new Path2D.Float();
 				} else if (type == 1) {
 					tmp.lineTo(coords[0], coords[1]);
 				}
@@ -374,5 +509,4 @@ public class UnidentifiedSpaces extends ModelCheck {
 		}
 		return null;
 	}
-
 }

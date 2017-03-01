@@ -21,6 +21,9 @@ public class FindAllCyclesAlgo<V extends Comparable<V>, E> {
 	}
 	
 	public List<Set<V>> findAllCycles() {
+		if (graph.vertexSet().size() == 0) {
+			return new ArrayList<>();
+		}
 		List<Set<V>> result = new ArrayList<>();
 		
 		threadPoolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors(), 1, TimeUnit.HOURS, new ArrayBlockingQueue<>(graph.vertexSet().size()));
@@ -38,6 +41,8 @@ public class FindAllCyclesAlgo<V extends Comparable<V>, E> {
 			e.printStackTrace();
 		}
 		
+		System.out.println("Found " + cycles.size() + " cycles");
+		
 //		for (Cycle<V> cycle : cycles) {
 //			System.out.println(cycle);
 //			int innerCycles = 0;
@@ -53,6 +58,10 @@ public class FindAllCyclesAlgo<V extends Comparable<V>, E> {
 //				result.add(cycle.asSet());
 //			}
 //		}
+		
+		for (Cycle<V> cycle : cycles) {
+			result.add(cycle.asSet());
+		}
 		
 		return result;
 	}

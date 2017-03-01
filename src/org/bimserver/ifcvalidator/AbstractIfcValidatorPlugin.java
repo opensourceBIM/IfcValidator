@@ -59,11 +59,14 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		
 		IssueInterface issueInterface = createIssueInterface(translator);
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
-			issueInterface.addHeader(translator.translate(groupIdentifier + "_HEADER"));
+			boolean headerAdded = false;
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
+						if (!headerAdded) {
+							issueInterface.addHeader(translator.translate(groupIdentifier + "_HEADER"));
+						}
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
 						boolean check = modelCheck.check(model, issueInterface, translator);
 						issueInterface.setCheckValid(fullIdentifier, check);

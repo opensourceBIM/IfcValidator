@@ -1,24 +1,24 @@
 package org.bimserver.ifcvalidator.checks;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class Cycle<V extends Comparable<V>> {
 
-	private final LinkedHashSet<V> vertices = new LinkedHashSet<>();
+	private LinkedHashSet<V> vertices;
 
 	public Cycle() {
+		vertices = new LinkedHashSet<>();
 	}
 
-	public Cycle(Collection<V> path) {
-		vertices.addAll(path);
+	public Cycle(LinkedHashSet<V> path) {
+		this.vertices = path;
 	}
 
 	public Cycle(V...vs) {
+		vertices = new LinkedHashSet<>();
 		for (V v : vs) {
 			add(v);
 		}
@@ -56,18 +56,21 @@ public class Cycle<V extends Comparable<V>> {
 	
 	@SuppressWarnings("unchecked")
 	public Cycle<V> getCanonical() {
-		List<V> list = new ArrayList<>(vertices);
-		Collections.sort(list);
-		V first = list.get(0);
+		V max = null;
+		for (V v : vertices) {
+			if (max == null || v.compareTo(max) < 0) {
+				max = v;
+			}
+		}
 		Object[] array = vertices.toArray();
 		int start = 0;
 		for (int i=0; i<array.length; i++) {
-			if (array[i] == first) {
+			if (array[i] == max) {
 				start = i;
 				break;
 			}
 		}
-		List<V> result = new ArrayList<>();
+		LinkedHashSet<V> result = new LinkedHashSet<>();
 		result.add((V) array[start]);
 
 		boolean reverse = ((V)(array[(start + 1) % array.length])).compareTo((V)(array[(start + 2) % array.length])) > 0;
@@ -112,5 +115,33 @@ public class Cycle<V extends Comparable<V>> {
 
 	public Set<V> asSet() {
 		return vertices;
+	}
+
+	public static <V extends Comparable<V>> Cycle<V> canonical(Stack<V> path) {
+		V max = null;
+		int index = 0;
+		int maxIndex = 0;
+		for (V v : path) {
+			if (max == null || v.compareTo(max) < 0) {
+				max = v;
+				maxIndex = index;
+			}
+			index++;
+		}
+		Object[] array = path.toArray();
+		LinkedHashSet<V> result = new LinkedHashSet<>();
+		result.add((V) array[maxIndex]);
+
+		boolean reverse = ((V)(array[(maxIndex + 1) % array.length])).compareTo((V)(array[(maxIndex + 2) % array.length])) > 0;
+		if (reverse) {
+			for (int i=maxIndex - 1 + array.length; i>maxIndex; i--) {
+				result.add((V) array[i % array.length]);
+			}
+		} else {
+			for (int i=maxIndex + 1; i<maxIndex + array.length; i++) {
+				result.add((V) array[i % array.length]);
+			}
+		}
+		return new Cycle<>(result);
 	}
 }

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
+import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.IssueValidationException;
@@ -73,7 +74,8 @@ public class ExcelIssueInterface implements IssueInterface {
 	}
 	
 	@Override
-	public void add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
+	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
+		Issue issue = new Issue();
 		try {
 			CellFormat cellFormat = messageType == Type.ERROR ? error : ok;
 			sheet.addCell(new Label(1, row, type, cellFormat));
@@ -95,6 +97,7 @@ public class ExcelIssueInterface implements IssueInterface {
 		} catch (WriteException e) {
 			e.printStackTrace();
 		}
+		return issue;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 
@@ -30,8 +31,7 @@ public class CycleFinder<V extends Comparable<V>, E> implements Runnable {
 			if (e != previousEdge) {
 				V target = getOpposed(current, e);
 				if (target == start) {
-					Cycle<V> cycle = new Cycle<V>(path);
-					Cycle<V> canonical = cycle.getCanonical();
+					Cycle<V> canonical = Cycle.canonical(path);
 					cycles.add(canonical);
 				} else {
 					if (!done.contains(target)) {
@@ -43,7 +43,7 @@ public class CycleFinder<V extends Comparable<V>, E> implements Runnable {
 		done.remove(current);
 		path.pop();
 	}
-	
+
 	private V getOpposed(V from, E e) {
 		if (graph.getEdgeSource(e) == from) {
 			return graph.getEdgeTarget(e);
