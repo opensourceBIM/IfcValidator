@@ -2,8 +2,6 @@ package org.bimserver.ifcvalidator.checks;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
-import org.bimserver.models.geometry.GeometryInfo;
-import org.bimserver.models.geometry.Vector3f;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSlab;
 import org.bimserver.validationreport.IssueInterface;
@@ -26,10 +24,10 @@ public class CorrectUseOfIfcEntitities extends ModelCheck {
 	}
 
 	private void checkHeightLessThenWidthOrDepth(IfcProduct ifcProduct) {
-		GeometryInfo geometry = ifcProduct.getGeometry();
-		if (geometry != null) {
-			Vector3f max = geometry.getMaxBounds();
-			Vector3f min = geometry.getMinBounds();
-		}
+//		GeometryInfo geometry = ifcProduct.getGeometry();
+//		if (geometry != null) {
+//			Vector3f max = geometry.getMaxBounds();
+//			Vector3f min = geometry.getMinBounds();
+//		}
 	}
 }
