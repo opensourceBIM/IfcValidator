@@ -4,18 +4,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.List;
 
-import org.bimserver.tests.emf.TestListWalls;
 import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
-import org.jgrapht.EdgeFactory;
-import org.jgrapht.alg.cycle.PatonCycleBase;
-import org.jgrapht.graph.ClassBasedEdgeFactory;
-import org.jgrapht.graph.Pseudograph;
 
 public class Test {
 	public static class V {
