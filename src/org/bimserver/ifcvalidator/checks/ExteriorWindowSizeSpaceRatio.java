@@ -35,6 +35,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
 				IfcElement relatedBuildingElement = ifcRelSpaceBoundary.getRelatedBuildingElement();
 				if (relatedBuildingElement != null) {
+					boolean wallExternal = IfcUtils.getBooleanProperty(relatedBuildingElement, "IsExternal") == Tristate.TRUE;
 					for (IfcRelVoidsElement ifcRelVoidsElement : relatedBuildingElement.getHasOpenings()) {
 						IfcFeatureElementSubtraction relatedOpeningElement = ifcRelVoidsElement.getRelatedOpeningElement();
 						if (relatedOpeningElement instanceof IfcOpeningElement) {
@@ -43,7 +44,8 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 								IfcElement relatedBuildingElement2 = ifcRelFillsElement.getRelatedBuildingElement();
 								if (relatedBuildingElement2 instanceof IfcWindow) {
 									IfcWindow ifcWindow = (IfcWindow)relatedBuildingElement2;
-									if (IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE) {
+									boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
+									if (windowExternal || wallExternal) {
 										double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight();
 										GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
 										if (windowGeometry != null) {
