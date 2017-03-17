@@ -12,8 +12,9 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bimserver.validationreport.Issue;
-import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
+import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.IssueValidationException;
 import org.bimserver.validationreport.Type;
 import org.opensourcebim.bcf.BcfException;
@@ -34,63 +35,58 @@ public class BcfInterface implements IssueContainerSerializer {
 		bcfFile = new BcfFile();
 	}
 	
-	@Override
-	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
-		TopicFolder topicFolder = bcfFile.createTopicFolder();
-		Topic topic = topicFolder.createTopic();
-		topic.setTitle(message);
-		topic.setGuid(topicFolder.getUuid().toString());
-		topic.setTopicStatus(messageType.toString());
-		topic.setCreationAuthor("Test");
-		topicFolder.setDefaultSnapShotToDummy();
-
-		Issue issue = new Issue(){
-			@Override
-			public void addImage(BufferedImage image) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				try {
-					ImageIO.write(image, "png", baos);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				topicFolder.setDefaultSnapShot(baos.toByteArray());
-				
-				topicFolder.addSnapShot("snapshot.png", baos.toByteArray());
-				
-				ViewPoint viewPoint = new ViewPoint();
-				viewPoint.setSnapshot("snapshot.png");
-				viewPoint.setGuid(topicFolder.getUuid().toString());
-				viewPoint.setViewpoint(UUID.randomUUID().toString());
-				topicFolder.getMarkup().getViewpoints().add(viewPoint);
-			}
-		};
-		
-		Markup markup = topicFolder.getMarkup();
-		Header header = new Header();
-		markup.setHeader(header);
-		List<File> files = header.getFile();
-		
-		File file = new File();
-		file.setIfcSpatialStructureElement(guid);
-		files.add(file);
-		
-		GregorianCalendar now = new GregorianCalendar();
-		try {
-			topicFolder.getMarkup().getTopic().setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(now));
-		} catch (DatatypeConfigurationException e) {
-			throw new IssueException(e);
-		}
-		return issue;
-	}
-
-	@Override
-	public void addHeader(String translate) {
-		// No headers in BCF
-	}
+//	@Override
+//	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
+//		TopicFolder topicFolder = bcfFile.createTopicFolder();
+//		Topic topic = topicFolder.createTopic();
+//		topic.setTitle(message);
+//		topic.setGuid(topicFolder.getUuid().toString());
+//		topic.setTopicStatus(messageType.toString());
+//		topic.setCreationAuthor("Test");
+//		topicFolder.setDefaultSnapShotToDummy();
+//
+//		Issue issue = new Issue(){
+//			@Override
+//			public void addImage(BufferedImage image) {
+//				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//				try {
+//					ImageIO.write(image, "png", baos);
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//
+//				topicFolder.setDefaultSnapShot(baos.toByteArray());
+//				
+//				topicFolder.addSnapShot("snapshot.png", baos.toByteArray());
+//				
+//				ViewPoint viewPoint = new ViewPoint();
+//				viewPoint.setSnapshot("snapshot.png");
+//				viewPoint.setGuid(topicFolder.getUuid().toString());
+//				viewPoint.setViewpoint(UUID.randomUUID().toString());
+//				topicFolder.getMarkup().getViewpoints().add(viewPoint);
+//			}
+//		};
+//		
+//		Markup markup = topicFolder.getMarkup();
+//		Header header = new Header();
+//		markup.setHeader(header);
+//		List<File> files = header.getFile();
+//		
+//		File file = new File();
+//		file.setIfcSpatialStructureElement(guid);
+//		files.add(file);
+//		
+//		GregorianCalendar now = new GregorianCalendar();
+//		try {
+//			topicFolder.getMarkup().getTopic().setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(now));
+//		} catch (DatatypeConfigurationException e) {
+//			throw new IssueException(e);
+//		}
+//		return issue;
+//	}
 
 	@Override
-	public byte[] getBytes() throws IOException {
+	public byte[] getBytes(IssueContainer issueContainer) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			bcfFile.write(baos);
@@ -98,34 +94,5 @@ public class BcfInterface implements IssueContainerSerializer {
 			throw new IOException(e);
 		}
 		return baos.toByteArray();
-	}
-
-	@Override
-	public void validate() throws IssueValidationException {
-		try {
-			bcfFile.validate();
-		} catch (BcfValidationException e) {
-			throw new IssueValidationException();
-		}
-	}
-
-	@Override
-	public void setCheckValid(String identifier, boolean valid) {
-	}
-
-	@Override
-	public void add(Type messageType, String message, Object is, String shouldBe) throws IssueException {
-		add(messageType, null, null, null, message, is, shouldBe);
-	}
-
-	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
 	}
 }

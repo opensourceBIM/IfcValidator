@@ -14,12 +14,11 @@ public class OnlyOneIfcProject extends ModelCheck {
 		super("PROJECT", "ONLY_ONE_IFC_PROJECT");
 	}
 	
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcProject> projects = model.getAll(IfcProject.class);
 		
 		IfcProject ifcProject = projects.size() == 1 ? projects.get(0) : null;
-		issueContainer.add(projects.size() == 1 ? Type.SUCCESS : Type.ERROR, "IfcProject", ifcProject == null ? null : ifcProject.getGlobalId(), ifcProject == null ? null : ifcProject.getOid(), translator.translate("NUMBER_OF_PROJECTS"), projects.size() + " " + translator.translate(projects.size() == 1 ? "PROJECT" : "PROJECTS"), translator.translate("EXACTLY_ONE_PROJECT"));
-		
-		return projects.size() == 1;
+		issueContainer.builder().type(projects.size() == 1 ? Type.SUCCESS : Type.ERROR)
+		.object(ifcProject).message(translator.translate("NUMBER_OF_PROJECTS")).is(projects.size() + " " + translator.translate(projects.size() == 1 ? "PROJECT" : "PROJECTS")).shouldBe(translator.translate("EXACTLY_ONE_PROJECT")).add();;
 	}
 }

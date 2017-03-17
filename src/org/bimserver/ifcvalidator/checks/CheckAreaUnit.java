@@ -20,7 +20,7 @@ public class CheckAreaUnit extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		boolean valid = false;
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
@@ -45,6 +45,5 @@ public class CheckAreaUnit extends ModelCheck {
 				issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
 			}
 		}
-		return valid;
 	}
 }

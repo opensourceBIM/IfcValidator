@@ -21,7 +21,7 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 //		int nrBuildingStoreys = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuildingStorey());
 //		issueContainer.add(nrBuildingStoreys > 0 ? Type.SUCCESS : Type.ERROR, null, null, -1, "Number of building storeys", nrBuildingStoreys + " IfcBuildingStorey objects", "> 0 IfcBuildingStorey objects");
 		
@@ -39,19 +39,19 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 					} else {
 						int storeyNumber = Integer.parseInt(number);
 						if (mapped.containsKey(storeyNumber)) {
-							issueContainer.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Duplicate storey name", ifcBuildingStorey.getName(), "");
+							issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Duplicate storey name").is(ifcBuildingStorey.getName()).shouldBe("").add();
 							valid = false;
 						} else {
 							mapped.put(storeyNumber, ifcBuildingStorey);
-							issueContainer.add(Type.SUCCESS, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Valid building name", ifcBuildingStorey.getName(), "");
+							issueContainer.builder().type(Type.SUCCESS).object(ifcBuildingStorey).message("Valid building name").is(ifcBuildingStorey.getName()).shouldBe("").add();
 						}
 					}
 				} catch (NumberFormatException e) {
-					issueContainer.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Invalid building name, invalid number " + split[0], ifcBuildingStorey.getName(), "");
+					issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Invalid building name, invalid number " + split[0]).is(ifcBuildingStorey.getName()).shouldBe("").add();
 					valid = false;
 				}
 			} else {
-				issueContainer.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Invalid building name, no spaces", ifcBuildingStorey.getName(), "");
+				issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Invalid building name, no spaces").is(ifcBuildingStorey.getName()).shouldBe("").add();
 				valid = false;
 			}
 		}
@@ -82,14 +82,13 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 					lastStorey = ifcBuildingStorey;
 				} else {
 					increasingWithHeight = false;
-					issueContainer.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey), ifcBuildingStorey.getName(), "");
+					issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey)).is(ifcBuildingStorey.getName()).shouldBe("").add();
 					valid = false;
 				}
 			}
 			if (increasingWithHeight) {
-				issueContainer.add(Type.SUCCESS, "Storeys seem to be increasing with z-value and naming", "", "");
+				issueContainer.builder().type(Type.SUCCESS).message("Storeys seem to be increasing with z-value and naming").add();
 			}		
 		}
-		return valid;
 	}
 }

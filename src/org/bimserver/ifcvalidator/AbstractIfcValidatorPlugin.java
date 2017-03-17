@@ -72,7 +72,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 //							issueContainerSerializer.addHeader(translator.translate(groupIdentifier + "_HEADER"));
 //						}
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-						boolean check = modelCheck.check(model, issueContainer, translator);
+						modelCheck.check(model, issueContainer, translator);
 					}
 				}
 			}

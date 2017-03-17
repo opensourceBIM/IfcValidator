@@ -15,14 +15,13 @@ public class Tester {
 		modelCheckerRegistry = new ModelCheckerRegistry();
 	}
 	
-	public boolean test(IfcModelInterface model, String groupIdentifier, String identifier) {
+	public void test(IfcModelInterface model, String groupIdentifier, String identifier) {
 		ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
 		try {
-			return modelCheck.check(model, issueContainer, null);
+			modelCheck.check(model, issueContainer, null);
 		} catch (IssueException e) {
 			e.printStackTrace();
 		}
-		return false;
 	}
 
 	public IssueContainer getIssueContainer() {

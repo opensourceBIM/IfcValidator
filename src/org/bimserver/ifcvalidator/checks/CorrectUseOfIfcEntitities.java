@@ -16,11 +16,10 @@ public class CorrectUseOfIfcEntitities extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) {
 		for (IfcSlab ifcSlab : model.getAll(IfcSlab.class)) {
 			ifcSlab.getGeometry().getMaxBounds();
 		}
-		return true;
 	}
 
 	private void checkHeightLessThenWidthOrDepth(IfcProduct ifcProduct) {

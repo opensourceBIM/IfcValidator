@@ -20,7 +20,7 @@ public class CheckVolumeUnit extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		boolean valid = false;
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
@@ -34,17 +34,16 @@ public class CheckVolumeUnit extends ModelCheck {
 						volumeUnitFound = true;
 						boolean metres = ifcSIUnit.getName() == IfcSIUnitName.CUBIC_METRE;
 						boolean rightPrefix = ifcSIUnit.getPrefix() == IfcSIPrefix.NULL;
-						issueContainer.add(volumeUnitFound ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Volume unit definition", volumeUnitFound, "Found");
-						issueContainer.add(metres ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Volume unit", metres, "Cubic metres");
-						issueContainer.add(rightPrefix ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Volume unit prefix", ifcSIUnit.getPrefix(), "None");
+						issueContainer.builder().type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
+						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit").is(metres).shouldBe("Cubic metres").add();
+						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
 						valid = volumeUnitFound && metres && rightPrefix;
 					}
 				}
 			}
 			if (!volumeUnitFound) {
-				issueContainer.add(volumeUnitFound ? Type.SUCCESS : Type.ERROR, "Volume unit definition", volumeUnitFound, "Found");
+				issueContainer.builder().type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
 			}
 		}
-		return valid;
 	}
 }

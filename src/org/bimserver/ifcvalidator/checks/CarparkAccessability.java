@@ -103,7 +103,7 @@ public class CarparkAccessability extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		scaleToMm = IfcUtils.getLengthUnitPrefix(model);
 		int regularSpaces = 0;
 		int handicappedSpaces = 0;
@@ -167,7 +167,6 @@ public class CarparkAccessability extends ModelCheck {
 			issueContainer.builder().type(Type.CANNOT_CHECK).message("No carparks found, not checking").add();
 //			issueContainer.add(Type.CANNOT_CHECK, "No carparks found, not checking", "0", "> 0");
 		}
-		return false;
 	}
 	
 	private CarparkVote checkGeometry(IfcSpace ifcSpace) {

@@ -21,7 +21,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		boolean ok = true;
 		List<IfcProduct> products = model.getAllWithSubTypes(IfcProduct.class);
 		for (IfcProduct ifcProduct : products) {
@@ -36,9 +36,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 			}
 		}
 		if (ok) {
-			issueContainer.add(Type.SUCCESS, translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY"), translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY"), translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2"));
-			return true;
+			issueContainer.builder().type(Type.SUCCESS).message(translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY")).is(translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY")).shouldBe(translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2")).add();;
 		}
-		return false;
 	}
 }

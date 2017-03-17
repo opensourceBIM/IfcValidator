@@ -12,7 +12,6 @@ public class CheckNlSFB extends ModelCheck  {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
-		return true;
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 	}
 }

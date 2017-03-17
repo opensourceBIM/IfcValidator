@@ -11,11 +11,8 @@ import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
 import org.bimserver.test.TestWithEmbeddedServer;
-import org.bimserver.validationreport.JsonValidationReport;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 	@Test
@@ -32,10 +29,7 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
-			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
-			System.out.println(json);
-			Assert.assertEquals(false, result);
+			tester.test(model, "SPACES", "UNIDENTIFIED");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -56,10 +50,9 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
-			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
-			System.out.println(json);
-			Assert.assertEquals(false, result);
+			tester.test(model, "SPACES", "UNIDENTIFIED");
+			
+			tester.getIssueContainer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -80,10 +73,8 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
-			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
-			System.out.println(json);
-			Assert.assertEquals(false, result);
+			tester.test(model, "SPACES", "UNIDENTIFIED");
+			tester.getIssueContainer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -104,10 +95,8 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
-			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
-			System.out.println(json);
-			Assert.assertEquals(false, result);
+			tester.test(model, "SPACES", "UNIDENTIFIED");
+			tester.getIssueContainer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -128,10 +117,8 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
-			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
-			System.out.println(json);
-			Assert.assertEquals(false, result);
+			tester.test(model, "SPACES", "UNIDENTIFIED");
+			tester.getIssueContainer();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());

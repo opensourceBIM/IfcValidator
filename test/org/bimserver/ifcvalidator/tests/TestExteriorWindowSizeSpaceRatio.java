@@ -11,7 +11,6 @@ import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
 import org.bimserver.test.TestWithEmbeddedServer;
-import org.bimserver.validationreport.JsonValidationReport;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,9 +35,7 @@ public class TestExteriorWindowSizeSpaceRatio extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "GEOMETRY", "RATIOS");
-			System.out.println(tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER));
-			Assert.assertEquals(true, result);
+			tester.test(model, "GEOMETRY", "RATIOS");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();

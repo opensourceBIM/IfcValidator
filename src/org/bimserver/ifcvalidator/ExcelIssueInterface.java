@@ -81,44 +81,32 @@ public class ExcelIssueInterface implements IssueContainerSerializer {
 		row = 1;
 	}
 	
-	@Override
-	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
-		Issue issue = new Issue();
-		try {
-			CellFormat cellFormat = messageType == Type.ERROR ? error : ok;
-			sheet.addCell(new Label(1, row, type, cellFormat));
-			if (guid != null) {
-				sheet.addCell(new Label(2, row, guid, cellFormat));
-			} else {
-				if (oid == null || oid == -1) {
-					sheet.addCell(new Label(2, row, "", cellFormat));
-				} else {
-					sheet.addCell(new Label(2, row, "" + oid, cellFormat));
-				}
-			}
-			sheet.addCell(new Label(3, row, message, cellFormat));
-			sheet.addCell(new Label(4, row, "" + is, cellFormat));
-			sheet.addCell(new Label(5, row, shouldBe, cellFormat));
-			row++;
-		} catch (RowsExceededException e) {
-			e.printStackTrace();
-		} catch (WriteException e) {
-			e.printStackTrace();
-		}
-		return issue;
-	}
-
-	@Override
-	public void addHeader(String translate) {
-		try {
-			row++;
-			sheet.addCell(new Label(0, row++, translate, timesbold));
-		} catch (RowsExceededException e) {
-			e.printStackTrace();
-		} catch (WriteException e) {
-			e.printStackTrace();
-		}
-	}
+//	@Override
+//	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
+//		Issue issue = new Issue();
+//		try {
+//			CellFormat cellFormat = messageType == Type.ERROR ? error : ok;
+//			sheet.addCell(new Label(1, row, type, cellFormat));
+//			if (guid != null) {
+//				sheet.addCell(new Label(2, row, guid, cellFormat));
+//			} else {
+//				if (oid == null || oid == -1) {
+//					sheet.addCell(new Label(2, row, "", cellFormat));
+//				} else {
+//					sheet.addCell(new Label(2, row, "" + oid, cellFormat));
+//				}
+//			}
+//			sheet.addCell(new Label(3, row, message, cellFormat));
+//			sheet.addCell(new Label(4, row, "" + is, cellFormat));
+//			sheet.addCell(new Label(5, row, shouldBe, cellFormat));
+//			row++;
+//		} catch (RowsExceededException e) {
+//			e.printStackTrace();
+//		} catch (WriteException e) {
+//			e.printStackTrace();
+//		}
+//		return issue;
+//	}
 
 	@Override
 	public byte[] getBytes(IssueContainer issueContainer) throws IOException {

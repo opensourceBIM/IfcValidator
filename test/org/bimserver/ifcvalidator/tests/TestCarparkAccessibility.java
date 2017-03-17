@@ -12,11 +12,8 @@ import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
 import org.bimserver.test.TestWithEmbeddedServer;
 import org.bimserver.validationreport.IssueContainer;
-import org.bimserver.validationreport.JsonValidationReport;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 	@Test
@@ -30,12 +27,10 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "ACCESSIBILITY", "CARPARKS");
-			JsonValidationReport report = tester.getJsonValidationReport();
+			tester.test(model, "ACCESSIBILITY", "CARPARKS");
+			IssueContainer issueContainer = tester.getIssueContainer();
 			
-			new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(System.out, report.toJson(new ObjectMapper()));
-
-			Assert.assertEquals(21, report.getErrors().size());
+			Assert.assertEquals(21, issueContainer.list().size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -53,12 +48,10 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "ACCESSIBILITY", "CARPARKS");
-			JsonValidationReport report = tester.getJsonValidationReport();
+			tester.test(model, "ACCESSIBILITY", "CARPARKS");
+			IssueContainer issueContainer = tester.getIssueContainer();
 			
-			new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(System.out, report.toJson(new ObjectMapper()));
-			
-			Assert.assertEquals(21, report.getErrors().size());
+			Assert.assertEquals(21, issueContainer.list().size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
@@ -76,12 +69,10 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
 			Tester tester = new Tester();
-			boolean result = tester.test(model, "ACCESSIBILITY", "CARPARKS");
+			tester.test(model, "ACCESSIBILITY", "CARPARKS");
 			IssueContainer issueContainer = tester.getIssueContainer();
 
-			new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(System.out, report.toJson(new ObjectMapper()));
-			
-			Assert.assertEquals(0, report.getErrors().size());
+			Assert.assertEquals(0, issueContainer.list().size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());

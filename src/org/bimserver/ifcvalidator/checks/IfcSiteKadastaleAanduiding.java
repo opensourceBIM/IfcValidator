@@ -17,19 +17,16 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
-		boolean valid = sites.size() > 0;
 		for (IfcSite ifcSite : sites) {
 			try {
 				checkKadastraleAanduidingen(ifcSite);
-				issueContainer.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
+				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("Kadastrale aanduiding").is("Valid").shouldBe("Valid").add();
 			} catch (ValidationException e) {
-				issueContainer.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
-				valid = false;
+				issueContainer.builder().type(Type.ERROR).object(ifcSite).message(e.getMessage()).is(ifcSite.getName()).shouldBe("Valid").add();
 			}
 		}
-		return valid;
 	}
 	
 	private void checkKadastraleAanduidingen(IfcSite ifcSite) throws ValidationException {

@@ -75,7 +75,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		Random random = new Random();
 		boolean debug = false;
 		boolean removeAllWalls = true;
@@ -394,8 +394,6 @@ public class UnidentifiedSpaces extends ModelCheck {
 				display.setImage(image);
 			}
 		}
-
-		return false;
 	}
 	
 	private void writeToJson(IfcBuildingStorey ifcBuildingStorey, Pseudograph<IfcBuildingElementWrapper, IfcRelConnectsPathElements> graph) {

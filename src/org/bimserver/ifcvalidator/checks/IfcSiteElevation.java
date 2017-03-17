@@ -17,17 +17,16 @@ public class IfcSiteElevation extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		boolean valid = sites.size() > 0;
 		for (IfcSite ifcSite : model.getAll(IfcSite.class)) {
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefElevation())) {
-				issueContainer.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "RefElevation", ifcSite.getRefElevation(), "Not null");
+				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefElevation").is(ifcSite.getRefElevation()).shouldBe("Not null").add();
 			} else {
-				issueContainer.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "RefElevation", null, "Not null");
+				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefElevation").is(null).shouldBe("Not null").add();
 				valid = false;
 			}
 		}
-		return valid;
 	}
 }

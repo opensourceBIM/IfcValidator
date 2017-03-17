@@ -17,7 +17,7 @@ public class IfcSiteLatitude extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		boolean valid = sites.size() > 0;
 		for (IfcSite ifcSite : sites) {
@@ -25,12 +25,11 @@ public class IfcSiteLatitude extends ModelCheck {
 			
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefLatitude())) {
 				// TODO check whether this is a valid WSG84
-				issueContainer.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "RefLatitude", ifcSite.getRefLatitude(), "Not null");
+				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefLatitude").is(ifcSite.getRefLatitude()).shouldBe("Not null").add();
 			} else {
-				issueContainer.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "RefLatitude", null, "Not null");
+				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefLatitude").is(null).shouldBe("Not null").add();
 				valid = false;
 			}
 		}
-		return valid;
 	}
 }

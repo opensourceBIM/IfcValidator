@@ -11,7 +11,7 @@ public abstract class ModelCheck {
 	private String identifier;
 	private String groupIdentifier;
 
-	public abstract boolean check(IfcModelInterface model, IssueContainer issueContainer, org.bimserver.ifcvalidator.Translator translator) throws IssueException;
+	public abstract void check(IfcModelInterface model, IssueContainer issueContainer, org.bimserver.ifcvalidator.Translator translator) throws IssueException;
 
 	public String getIdentifier() {
 		return identifier;

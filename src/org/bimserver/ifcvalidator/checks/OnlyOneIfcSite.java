@@ -16,12 +16,10 @@ public class OnlyOneIfcSite extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		IfcSite ifcSite = sites.size() == 1 ? sites.get(0) : null;
 		
-		issueContainer.add(sites.size() == 1 ? Type.SUCCESS : Type.ERROR, "IfcSite", ifcSite == null ? null : ifcSite.getGlobalId(), ifcSite == null ? null : ifcSite.getOid(), translator.translate("NUMBER_OF_SITES"), sites.size() + " " + translator.translate(sites.size() == 1 ? "SITE" : "SITES"), translator.translate("EXACTLY_ONE_SITE"));
-		
-		return sites.size() == 1;
+		issueContainer.builder().type(sites.size() == 1 ? Type.SUCCESS : Type.ERROR).object(ifcSite).message(translator.translate("NUMBER_OF_SITES")).is(sites.size() + " " + translator.translate(sites.size() == 1 ? "SITE" : "SITES")).shouldBe(translator.translate("EXACTLY_ONE_SITE")).add();
 	}
 }

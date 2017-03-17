@@ -22,14 +22,12 @@ public class HasTrueNorthSet extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcProject> projects = model.getAll(IfcProject.class);
-		boolean valid = projects.size() > 0;
 		for (IfcProject ifcProject : projects) {
 			EList<IfcRepresentationContext> representationContexts = ifcProject.getRepresentationContexts();
 			if (representationContexts.isEmpty()) {
-				issueContainer.add(Type.ERROR, ifcProject.eClass().getName(), ifcProject.getGlobalId(), ifcProject.getOid(), translator.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS"), "0", "> 0");
-				valid = false;
+				issueContainer.builder().type(Type.ERROR).object(ifcProject).message(translator.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS")).is("0").shouldBe("> 0").add();
 			} else {
 				IfcDirection trueNorth = null;
 				IfcGeometricRepresentationContext context = null;
@@ -47,12 +45,8 @@ public class HasTrueNorthSet extends ModelCheck {
 					Joiner joiner = Joiner.on(", ").skipNulls();
 					stringVersion = joiner.join(trueNorth.getDirectionRatios());
 				}
-				issueContainer.add(trueNorth != null ? Type.SUCCESS : Type.ERROR, "IfcGeometricRepresentationContext", null, context == null ? null : context.getOid(), translator.translate("TRUE_NORTH_SET"), stringVersion, translator.translate("SET"));
-				if (trueNorth == null) {
-					valid = false;
-				}
+				issueContainer.builder().type(trueNorth != null ? Type.SUCCESS : Type.ERROR).message(translator.translate("TRUE_NORTH_SET")).is(stringVersion).shouldBe(translator.translate("SET")).add();
 			}
 		}
-		return valid;
 	}
 }
