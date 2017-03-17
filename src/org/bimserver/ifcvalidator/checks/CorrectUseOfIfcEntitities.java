@@ -4,7 +4,7 @@ import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSlab;
-import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.IssueContainer;
 
 // TODO
 public class CorrectUseOfIfcEntitities extends ModelCheck {
@@ -16,7 +16,7 @@ public class CorrectUseOfIfcEntitities extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) {
 		for (IfcSlab ifcSlab : model.getAll(IfcSlab.class)) {
 			ifcSlab.getGeometry().getMaxBounds();
 		}

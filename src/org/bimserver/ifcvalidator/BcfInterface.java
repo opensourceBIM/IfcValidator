@@ -13,7 +13,7 @@ import javax.xml.datatype.DatatypeFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.IssueValidationException;
 import org.bimserver.validationreport.Type;
 import org.opensourcebim.bcf.BcfException;
@@ -26,7 +26,7 @@ import org.opensourcebim.bcf.markup.Markup;
 import org.opensourcebim.bcf.markup.Topic;
 import org.opensourcebim.bcf.markup.ViewPoint;
 
-public class BcfInterface implements IssueInterface {
+public class BcfInterface implements IssueContainerSerializer {
 
 	private BcfFile bcfFile;
 

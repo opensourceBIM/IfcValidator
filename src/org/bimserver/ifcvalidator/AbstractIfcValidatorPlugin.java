@@ -21,7 +21,8 @@ import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.services.AbstractAddExtendedDataService;
 import org.bimserver.plugins.services.BimServerClientInterface;
 import org.bimserver.shared.exceptions.PluginException;
-import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.IssueContainer;
+import org.bimserver.validationreport.IssueContainerSerializer;
 
 public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService {
 
@@ -40,7 +41,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		super.init(pluginContext);
 	}
 	
-	protected abstract IssueInterface createIssueInterface(Translator translator);
+	protected abstract IssueContainerSerializer createIssueInterface(Translator translator);
 
 	@Override
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
@@ -59,32 +60,32 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		properties.load(Files.newInputStream(propertiesFile));
 		Translator translator = new Translator(filename, properties);
 		
-		IssueInterface issueInterface = createIssueInterface(translator);
+		IssueContainerSerializer issueContainerSerializer = createIssueInterface(translator);
+		IssueContainer issueContainer = new IssueContainer();
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			boolean headerAdded = false;
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
-						if (!generateExtendedDataPerCheck && !headerAdded) {
-							issueInterface.addHeader(translator.translate(groupIdentifier + "_HEADER"));
-						}
+//						if (!generateExtendedDataPerCheck && !headerAdded) {
+//							issueContainerSerializer.addHeader(translator.translate(groupIdentifier + "_HEADER"));
+//						}
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-						boolean check = modelCheck.check(model, issueInterface, translator);
-						issueInterface.setCheckValid(fullIdentifier, check);
+						boolean check = modelCheck.check(model, issueContainer, translator);
 					}
 				}
 			}
 			if (generateExtendedDataPerCheck) {
-				addExtendedData(issueInterface.getBytes(), getFileName(), groupIdentifier, getContentType(), bimServerClientInterface, roid);
-				issueInterface.reset();
+				addExtendedData(issueContainerSerializer.getBytes(issueContainer), getFileName(), groupIdentifier, getContentType(), bimServerClientInterface, roid);
+				issueContainer = new IssueContainer();
 			}
 		}
 		
-		issueInterface.validate();
+//		issueContainerSerializer.validate();
 		
 		if (!generateExtendedDataPerCheck) {
-			addExtendedData(issueInterface.getBytes(), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
+			addExtendedData(issueContainerSerializer.getBytes(issueContainer), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
 		}
 		
 		runningService.updateProgress(100);

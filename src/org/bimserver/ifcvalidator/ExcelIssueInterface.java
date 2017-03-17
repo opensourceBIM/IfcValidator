@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.bimserver.validationreport.Issue;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.IssueValidationException;
 import org.bimserver.validationreport.Type;
 
@@ -23,7 +24,7 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-public class ExcelIssueInterface implements IssueInterface {
+public class ExcelIssueInterface implements IssueContainerSerializer {
 
 	private WritableCellFormat times;
 	private WritableCellFormat timesbold;
@@ -120,7 +121,10 @@ public class ExcelIssueInterface implements IssueInterface {
 	}
 
 	@Override
-	public byte[] getBytes() throws IOException {
+	public byte[] getBytes(IssueContainer issueContainer) throws IOException {
+		for (Issue issue : issueContainer.list()) {
+			
+		}
 		for (int x = 0; x < 6; x++) {
 			CellView cell = sheet.getColumnView(x);
 			cell.setAutosize(true);
@@ -133,37 +137,5 @@ public class ExcelIssueInterface implements IssueInterface {
 			throw new IOException(e);
 		}
 		return byteArrayOutputStream.toByteArray();
-	}
-
-	@Override
-	public void validate() throws IssueValidationException {
-	}
-
-	@Override
-	public void setCheckValid(String identifier, boolean valid) {
-	}
-
-	@Override
-	public void add(Type messageType, String message, Object is, String shouldBe) throws IssueException {
-		add(messageType, null,  null,  null, message, is, shouldBe);
-	}
-
-	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void reset() {
-		try {
-			init(translator, wbSettings);
-		} catch (RowsExceededException e) {
-			e.printStackTrace();
-		} catch (WriteException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

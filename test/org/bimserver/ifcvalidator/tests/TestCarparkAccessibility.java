@@ -11,6 +11,7 @@ import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
 import org.bimserver.test.TestWithEmbeddedServer;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.JsonValidationReport;
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,8 +77,8 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			
 			Tester tester = new Tester();
 			boolean result = tester.test(model, "ACCESSIBILITY", "CARPARKS");
-			JsonValidationReport report = tester.getJsonValidationReport();
-			
+			IssueContainer issueContainer = tester.getIssueContainer();
+
 			new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(System.out, report.toJson(new ObjectMapper()));
 			
 			Assert.assertEquals(0, report.getErrors().size());

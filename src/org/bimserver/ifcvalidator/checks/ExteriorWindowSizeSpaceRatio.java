@@ -14,8 +14,8 @@ import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.models.ifc2x3tc1.IfcWindow;
 import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.utils.IfcUtils;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 
 public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
@@ -28,7 +28,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
 			double totalWindowArea = 0;
 			int nrWindowsUsed = 0;
@@ -52,7 +52,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 											windowGeometry.getMaxBoundsUntranslated();
 											double geometryArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
 											if (Math.abs(geometryArea - semanticArea) > 0.001) {
-												issueInterface.add(Type.ERROR, ifcWindow.eClass().getName(), ifcWindow.getGlobalId(), ifcWindow.getOid(), "Window area of geometry not consistent with semantic area (OverallWidth*OverallHeight)", String.format("%.2f", (semanticArea)), String.format("%.2f", (geometryArea)));
+												issueContainer.add(Type.ERROR, ifcWindow.eClass().getName(), ifcWindow.getGlobalId(), ifcWindow.getOid(), "Window area of geometry not consistent with semantic area (OverallWidth*OverallHeight)", String.format("%.2f", (semanticArea)), String.format("%.2f", (geometryArea)));
 											} else {
 												totalWindowArea += geometryArea;
 												nrWindowsUsed++;
@@ -66,18 +66,18 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 			if (nrWindowsUsed == 0) {
-				issueInterface.add(Type.CANNOT_CHECK, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"", "", "");
+				issueContainer.add(Type.CANNOT_CHECK, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"", "", "");
 			} else {
 				if (ifcSpace.getGeometry() != null) {
 					if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
-						issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio for space \"" + ifcSpace.getName() + "\"", String.format("%.2f", (totalWindowArea * conf.getRatio())), " > " + String.format("%.2f", ifcSpace.getGeometry().getArea()));
+						issueContainer.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio for space \"" + ifcSpace.getName() + "\"", String.format("%.2f", (totalWindowArea * conf.getRatio())), " > " + String.format("%.2f", ifcSpace.getGeometry().getArea()));
 					} else {
-						issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio for space \"" + ifcSpace.getName() + "\"", String.format("%.2f", (totalWindowArea * conf.getRatio())), " > " + String.format("%.2f", ifcSpace.getGeometry().getArea()));
+						issueContainer.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Window/space area ratio for space \"" + ifcSpace.getName() + "\"", String.format("%.2f", (totalWindowArea * conf.getRatio())), " > " + String.format("%.2f", ifcSpace.getGeometry().getArea()));
 					}
 				}
 			}
 		}
-		return issueInterface.isValid();
+		return issueContainer.isValid();
 	}
 	
 	private double getBiggestSingleFaceOfUntranslatedBoundingBox(GeometryInfo geometryInfo) {

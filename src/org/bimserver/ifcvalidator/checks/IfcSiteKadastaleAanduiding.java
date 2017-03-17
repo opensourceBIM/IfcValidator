@@ -6,8 +6,8 @@ import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.ifcvalidator.ValidationException;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 
 public class IfcSiteKadastaleAanduiding extends ModelCheck {
@@ -17,15 +17,15 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		boolean valid = sites.size() > 0;
 		for (IfcSite ifcSite : sites) {
 			try {
 				checkKadastraleAanduidingen(ifcSite);
-				issueInterface.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
+				issueContainer.add(Type.SUCCESS, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), "Kadastrale aanduiding", "Valid", "Valid");
 			} catch (ValidationException e) {
-				issueInterface.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
+				issueContainer.add(Type.ERROR, ifcSite.eClass().getName(), ifcSite.getGlobalId(), ifcSite.getOid(), e.getMessage(), ifcSite.getName(), "Valid");
 				valid = false;
 			}
 		}

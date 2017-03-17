@@ -6,18 +6,11 @@ import java.util.Map;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
-import org.bimserver.models.ifc2x3tc1.IfcExtrudedAreaSolid;
-import org.bimserver.models.ifc2x3tc1.IfcProductRepresentation;
-import org.bimserver.models.ifc2x3tc1.IfcProfileDef;
-import org.bimserver.models.ifc2x3tc1.IfcRectangleProfileDef;
-import org.bimserver.models.ifc2x3tc1.IfcRepresentation;
-import org.bimserver.models.ifc2x3tc1.IfcRepresentationItem;
-import org.bimserver.models.ifc2x3tc1.IfcShapeRepresentation;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 
 /*
@@ -110,7 +103,7 @@ public class CarparkAccessability extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		scaleToMm = IfcUtils.getLengthUnitPrefix(model);
 		int regularSpaces = 0;
 		int handicappedSpaces = 0;
@@ -124,51 +117,55 @@ public class CarparkAccessability extends ModelCheck {
 				CarparkVote geometryVote = checkGeometry(ifcSpace);
 				if (psetVote.equals(geometryVote)) {
 					if (psetVote.carparkVoteType == CarparkVoteType.REGULAR_CARPARK) {
-						issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Both pset and geometry agree that this is a regular carpark", "", "");
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Both pset and geometry agree that this is a regular carpark").add();
 						regularSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.HANDICAPPED_CARPARK) {
-						issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Both pset and geometry agree that this is a handicapped carpark", "", "");
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Both pset and geometry agree that this is a handicapped carpark").add();
 						handicappedSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.NOT_A_CARPARK) {
 						// Both agree this is not a carpark, so do nothing
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_CARPARK) {
-						issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Both pset and geometry check did not lead to identifying the nature of this carpark", "", "");
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Both pset and geometry check did not lead to identifying the nature of this carpark").add();
 						unidentifiedCarparks++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_SPACE) {
-						issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Both pset and geometry check did not lead to identifying the nature of this space", "", "");
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Both pset and geometry check did not lead to identifying the nature of this space").add();
 						unidentifiedSpaces++;
 					}
 				} else {
 					// Both checks do not agree
 					if (psetVote.carparkVoteType == CarparkVoteType.REGULAR_CARPARK) {
-						issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree", "", "");
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
 						regularSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.HANDICAPPED_CARPARK) {
-						issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree", "", "");
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
 						handicappedSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.NOT_A_CARPARK) {
-//					issueInterface.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is not a carpark according to " + mostCertain.getType(), "", "");
+//					issueContainer.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is not a carpark according to " + mostCertain.getType(), "", "");
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_CARPARK) {
-						issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "The nature of this carpark could not be identified semantically", "", "");
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("The nature of this carpark could not be identified semantically").add();
 						unidentifiedCarparks++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_SPACE) {
-						issueInterface.add(Type.ERROR, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "Both pset and geometry check did not lead to identifying the nature of this space", "", "");
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Both pset and geometry check did not lead to identifying the nature of this space").add();
 						unidentifiedSpaces++;
 					}
 				}
 			}
 		}
 		if (unidentifiedSpaces > 0) {
-			issueInterface.add(Type.ERROR, "The amount of unidentified spaces is too high", "" + unidentifiedSpaces, "" + 0);
+//			issueContainer.add(Type.ERROR, "The amount of unidentified spaces is too high", "" + unidentifiedSpaces, "" + 0);
+			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified spaces is too high").add();
 		}
 		if (unidentifiedCarparks > 0) {
-			issueInterface.add(Type.ERROR, "The amount of unidentified carparks is too high", "" + unidentifiedCarparks, "" + 0);
+			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified carparks is too high").add();
+//			issueContainer.add(Type.ERROR, "The amount of unidentified carparks is too high", "" + unidentifiedCarparks, "" + 0);
 		}
 		if (regularSpaces > handicappedSpaces * conf.getRatioHandicappedToRegularParking()) {
-			issueInterface.add(Type.ERROR, "The amount of handicapped carparks should be higher", "" + handicappedSpaces, "" + (regularSpaces / conf.getRatioHandicappedToRegularParking()));
+			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").add();
+//			issueContainer.add(Type.ERROR, "The amount of handicapped carparks should be higher", "" + handicappedSpaces, "" + (regularSpaces / conf.getRatioHandicappedToRegularParking()));
 		}
 		if (totalCarparks == 0) {
-			issueInterface.add(Type.CANNOT_CHECK, "No carparks found, not checking", "0", "> 0");
+			issueContainer.builder().type(Type.CANNOT_CHECK).message("No carparks found, not checking").add();
+//			issueContainer.add(Type.CANNOT_CHECK, "No carparks found, not checking", "0", "> 0");
 		}
 		return false;
 	}

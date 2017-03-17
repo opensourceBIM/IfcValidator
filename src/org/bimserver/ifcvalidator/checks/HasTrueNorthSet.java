@@ -8,8 +8,8 @@ import org.bimserver.models.ifc2x3tc1.IfcDirection;
 import org.bimserver.models.ifc2x3tc1.IfcGeometricRepresentationContext;
 import org.bimserver.models.ifc2x3tc1.IfcProject;
 import org.bimserver.models.ifc2x3tc1.IfcRepresentationContext;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 import org.eclipse.emf.common.util.EList;
 
@@ -22,13 +22,13 @@ public class HasTrueNorthSet extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcProject> projects = model.getAll(IfcProject.class);
 		boolean valid = projects.size() > 0;
 		for (IfcProject ifcProject : projects) {
 			EList<IfcRepresentationContext> representationContexts = ifcProject.getRepresentationContexts();
 			if (representationContexts.isEmpty()) {
-				issueInterface.add(Type.ERROR, ifcProject.eClass().getName(), ifcProject.getGlobalId(), ifcProject.getOid(), translator.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS"), "0", "> 0");
+				issueContainer.add(Type.ERROR, ifcProject.eClass().getName(), ifcProject.getGlobalId(), ifcProject.getOid(), translator.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS"), "0", "> 0");
 				valid = false;
 			} else {
 				IfcDirection trueNorth = null;
@@ -47,7 +47,7 @@ public class HasTrueNorthSet extends ModelCheck {
 					Joiner joiner = Joiner.on(", ").skipNulls();
 					stringVersion = joiner.join(trueNorth.getDirectionRatios());
 				}
-				issueInterface.add(trueNorth != null ? Type.SUCCESS : Type.ERROR, "IfcGeometricRepresentationContext", null, context == null ? null : context.getOid(), translator.translate("TRUE_NORTH_SET"), stringVersion, translator.translate("SET"));
+				issueContainer.add(trueNorth != null ? Type.SUCCESS : Type.ERROR, "IfcGeometricRepresentationContext", null, context == null ? null : context.getOid(), translator.translate("TRUE_NORTH_SET"), stringVersion, translator.translate("SET"));
 				if (trueNorth == null) {
 					valid = false;
 				}

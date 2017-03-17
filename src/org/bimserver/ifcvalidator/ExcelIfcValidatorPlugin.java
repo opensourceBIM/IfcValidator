@@ -1,6 +1,6 @@
 package org.bimserver.ifcvalidator;
 
-import org.bimserver.validationreport.IssueInterface;
+import org.bimserver.validationreport.IssueContainerSerializer;
 
 public class ExcelIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
@@ -9,7 +9,7 @@ public class ExcelIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 	}
 
 	@Override
-	protected IssueInterface createIssueInterface(Translator translator) {
+	protected IssueContainerSerializer createIssueInterface(Translator translator) {
 		return new ExcelIssueInterface(translator);
 	}
 

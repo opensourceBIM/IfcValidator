@@ -5,8 +5,8 @@ import java.util.List;
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 
 public class AtLeastOneBuildingStorey extends ModelCheck {
@@ -16,13 +16,13 @@ public class AtLeastOneBuildingStorey extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcBuildingStorey> buildingStories = model.getAll(IfcBuildingStorey.class);
 		int size = buildingStories.size();
 		IfcBuildingStorey buildingStorey = size == 1 ? buildingStories.get(0) : null;
 		
 		boolean valid = size > 0;
-		issueInterface.add(valid ? Type.SUCCESS : Type.ERROR, buildingStorey == null ? null : "IfcBuildingStorey", buildingStorey == null ? null : buildingStorey.getGlobalId(), buildingStorey == null ? null : buildingStorey.getOid(), translator.translate("NUMBER_OF_BUILDING_STOREYS"), size + " " + translator.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING_STOREY"));
+		issueContainer.add(valid ? Type.SUCCESS : Type.ERROR, buildingStorey == null ? null : "IfcBuildingStorey", buildingStorey == null ? null : buildingStorey.getGlobalId(), buildingStorey == null ? null : buildingStorey.getOid(), translator.translate("NUMBER_OF_BUILDING_STOREYS"), size + " " + translator.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING_STOREY"));
 		return valid;
 	}
 }

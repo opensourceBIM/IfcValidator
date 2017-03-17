@@ -9,8 +9,8 @@ import org.bimserver.models.ifc2x3tc1.IfcSIUnitName;
 import org.bimserver.models.ifc2x3tc1.IfcUnit;
 import org.bimserver.models.ifc2x3tc1.IfcUnitAssignment;
 import org.bimserver.models.ifc2x3tc1.IfcUnitEnum;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 
 public class CheckAreaUnit extends ModelCheck {
@@ -20,7 +20,7 @@ public class CheckAreaUnit extends ModelCheck {
 	}
 
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		boolean valid = false;
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
@@ -34,15 +34,15 @@ public class CheckAreaUnit extends ModelCheck {
 						areaUnitFound = true;
 						boolean metres = ifcSIUnit.getName() == IfcSIUnitName.SQUARE_METRE;
 						boolean rightPrefix = ifcSIUnit.getPrefix() == IfcSIPrefix.NULL;
-						issueInterface.add(areaUnitFound ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Area unit definition", areaUnitFound, "Found");
-						issueInterface.add(metres ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Area unit", metres, "Metres squared");
-						issueInterface.add(rightPrefix ? Type.SUCCESS : Type.ERROR, ifcSIUnit.eClass().getName(), null, ifcSIUnit.getOid(), "Area unit prefix", ifcSIUnit.getPrefix(), "None");
+						issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
+						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit").is(metres).shouldBe("Metres squared").add();
+						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
 						valid = areaUnitFound && metres && rightPrefix;
 					}
 				}
 			}
 			if (!areaUnitFound) {
-				issueInterface.add(areaUnitFound ? Type.SUCCESS : Type.ERROR, "Area unit definition", areaUnitFound, "Found");
+				issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
 			}
 		}
 		return valid;

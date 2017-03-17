@@ -32,8 +32,8 @@ import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
 import org.bimserver.validationreport.Issue;
+import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.Type;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
@@ -75,7 +75,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 	}
 	
 	@Override
-	public boolean check(IfcModelInterface model, IssueInterface issueInterface, Translator translator) throws IssueException {
+	public boolean check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		Random random = new Random();
 		boolean debug = false;
 		boolean removeAllWalls = true;
@@ -365,9 +365,8 @@ public class UnidentifiedSpaces extends ModelCheck {
 					newPath.closePath();
 					float area = Math.abs(IfcTools2D.getArea(new Area(newPath)));
 					if (area > 0.001) {
-						Issue issue = issueInterface.add(Type.ERROR, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"", "", "");
 						BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, newPath);
-						issue.addImage(errorImage);
+						issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 						nrErrors++;
 					}
 					newPath = new Path2D.Float();
@@ -382,9 +381,8 @@ public class UnidentifiedSpaces extends ModelCheck {
 			}
 
 			if (nrErrors == 0) {
-				Issue issue = issueInterface.add(Type.SUCCESS, ifcBuildingStorey.eClass().getName(), ifcBuildingStorey.getGlobalId(), ifcBuildingStorey.getOid(), "No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"", "", "");
 				BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, null);
-				issue.addImage(errorImage);
+				issueContainer.builder().type(Type.SUCCESS).object(ifcBuildingStorey).buildingStorey(ifcBuildingStorey).message("No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 			}
 			
 			graphics.setColor(Color.RED);
