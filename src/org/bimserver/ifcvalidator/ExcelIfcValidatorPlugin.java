@@ -5,7 +5,7 @@ import org.bimserver.validationreport.IssueInterface;
 public class ExcelIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public ExcelIfcValidatorPlugin() {
-		super("VALIDATION_XLSX_1_0");
+		super("VALIDATION_XLSX_1_0", false);
 	}
 
 	@Override

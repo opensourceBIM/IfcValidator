@@ -8,6 +8,12 @@
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifcvalidator.ValidationReportPerCheckIfcValidatorPlugin</implementationClass>
+		<name>IFC Validator (ED per check)</name>
+		<description>Validates IFC models according to user defined settings</description>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifcvalidator.BcfIfcValidatorPlugin</implementationClass>
 		<name>IFC Validator (BCF)</name>
 		<description>Validates IFC models according to user defined settings, output as BCF</description>

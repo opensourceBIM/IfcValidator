@@ -143,7 +143,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 				}
 			}
 
-			writeToJson(ifcBuildingStorey, graph);
+//			writeToJson(ifcBuildingStorey, graph);
 			
 //			new Simplyfier().simplify(graph);
 
@@ -157,7 +157,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			}
 			
 			FindAllCyclesAlgo<IfcBuildingElementWrapper, IfcRelConnectsPathElements> algorighm = new FindAllCyclesAlgo<>(graph);
-			List<Set<IfcBuildingElementWrapper>> findSimpleCycles = new ArrayList<>();//.findAllCycles();
+			List<Set<IfcBuildingElementWrapper>> findSimpleCycles = algorighm.findAllCycles();
 			
 			double scaleX = 1600 / totalArea.getBounds().getWidth();
 			double scaleY = 1600 / totalArea.getBounds().getHeight();

@@ -26,9 +26,11 @@ import org.bimserver.validationreport.IssueInterface;
 public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService {
 
 	private final ModelCheckerRegistry modelCheckerRegistry;
+	private boolean generateExtendedDataPerCheck = false;
 
-	public AbstractIfcValidatorPlugin(String namespace) {
+	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck) {
 		super(namespace);
+		this.generateExtendedDataPerCheck = generateExtendedDataPerCheck;
 		
 		modelCheckerRegistry = new ModelCheckerRegistry();
 	}
@@ -64,7 +66,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
-						if (!headerAdded) {
+						if (!generateExtendedDataPerCheck && !headerAdded) {
 							issueInterface.addHeader(translator.translate(groupIdentifier + "_HEADER"));
 						}
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
@@ -73,11 +75,17 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 					}
 				}
 			}
+			if (generateExtendedDataPerCheck) {
+				addExtendedData(issueInterface.getBytes(), getFileName(), groupIdentifier, getContentType(), bimServerClientInterface, roid);
+				issueInterface.reset();
+			}
 		}
 		
 		issueInterface.validate();
 		
-		addExtendedData(issueInterface.getBytes(), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
+		if (!generateExtendedDataPerCheck) {
+			addExtendedData(issueInterface.getBytes(), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
+		}
 		
 		runningService.updateProgress(100);
 	}

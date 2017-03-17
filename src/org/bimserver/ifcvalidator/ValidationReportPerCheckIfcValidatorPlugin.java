@@ -3,10 +3,10 @@ package org.bimserver.ifcvalidator;
 import org.bimserver.validationreport.IssueInterface;
 import org.bimserver.validationreport.JsonValidationReport;
 
-public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
+public class ValidationReportPerCheckIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
-	public ValidationReportIfcValidatorPlugin() {
-		super("VALIDATION_JSON_1_0", false);
+	public ValidationReportPerCheckIfcValidatorPlugin() {
+		super("VALIDATION_JSON_1_0", true);
 	}
 
 	@Override

@@ -33,10 +33,13 @@ public class ExcelIssueInterface implements IssueInterface {
 	private int row;
 	private WritableCellFormat error;
 	private WritableCellFormat ok;
+	private Translator translator;
+	private WorkbookSettings wbSettings;
 
 	public ExcelIssueInterface(Translator translator) {
-	    try {
-	    	WorkbookSettings wbSettings = new WorkbookSettings();
+	    this.translator = translator;
+		try {
+	    	wbSettings = new WorkbookSettings();
 	    	
 	    	wbSettings.setLocale(new Locale("en", "EN"));
 	    	
@@ -53,24 +56,28 @@ public class ExcelIssueInterface implements IssueInterface {
 			ok = new WritableCellFormat(times10pt);
 			ok.setBackground(Colour.LIGHT_GREEN);
 			
-			byteArrayOutputStream = new ByteArrayOutputStream();
-			workbook = Workbook.createWorkbook(byteArrayOutputStream, wbSettings);
-			
-			sheet = workbook.createSheet("Sheet 1", 0);
-			
-			sheet.addCell(new Label(0, 0, translator.translate("REPORT_HEADER"), timesbold));
-			sheet.addCell(new Label(1, 0, translator.translate("REPORT_TYPE"), timesbold));
-			sheet.addCell(new Label(2, 0, translator.translate("REPORT_GUID_OID"), timesbold));
-			sheet.addCell(new Label(3, 0, translator.translate("REPORT_MESSAGE"), timesbold));
-			sheet.addCell(new Label(4, 0, translator.translate("REPORT_VALUE_IS"), timesbold));
-			sheet.addCell(new Label(5, 0, translator.translate("REPORT_VALUE_SHOULD_BE"), timesbold));
-			
-			row = 1;
+			init(translator, wbSettings);
 		} catch (WriteException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void init(Translator translator, WorkbookSettings wbSettings) throws IOException, WriteException, RowsExceededException {
+		byteArrayOutputStream = new ByteArrayOutputStream();
+		workbook = Workbook.createWorkbook(byteArrayOutputStream, wbSettings);
+		
+		sheet = workbook.createSheet("Sheet 1", 0);
+		
+		sheet.addCell(new Label(0, 0, translator.translate("REPORT_HEADER"), timesbold));
+		sheet.addCell(new Label(1, 0, translator.translate("REPORT_TYPE"), timesbold));
+		sheet.addCell(new Label(2, 0, translator.translate("REPORT_GUID_OID"), timesbold));
+		sheet.addCell(new Label(3, 0, translator.translate("REPORT_MESSAGE"), timesbold));
+		sheet.addCell(new Label(4, 0, translator.translate("REPORT_VALUE_IS"), timesbold));
+		sheet.addCell(new Label(5, 0, translator.translate("REPORT_VALUE_SHOULD_BE"), timesbold));
+		
+		row = 1;
 	}
 	
 	@Override
@@ -145,5 +152,18 @@ public class ExcelIssueInterface implements IssueInterface {
 	public boolean isValid() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void reset() {
+		try {
+			init(translator, wbSettings);
+		} catch (RowsExceededException e) {
+			e.printStackTrace();
+		} catch (WriteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

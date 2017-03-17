@@ -123,4 +123,9 @@ public class BcfInterface implements IssueInterface {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+	}
 }

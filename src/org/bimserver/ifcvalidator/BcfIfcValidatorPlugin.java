@@ -5,7 +5,7 @@ import org.bimserver.validationreport.IssueInterface;
 public class BcfIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public BcfIfcValidatorPlugin() {
-		super("BCF_ZIP_2_0");
+		super("BCF_ZIP_2_0", false);
 	}
 
 	@Override
