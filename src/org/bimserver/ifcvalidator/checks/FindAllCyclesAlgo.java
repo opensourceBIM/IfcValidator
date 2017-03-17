@@ -28,7 +28,7 @@ public class FindAllCyclesAlgo<V extends Comparable<V>, E> {
 		
 		threadPoolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors(), 1, TimeUnit.HOURS, new ArrayBlockingQueue<>(graph.vertexSet().size()));
 		
-		System.out.println("Looking for cycles in " + graph.vertexSet().size() + " vertices");
+		System.out.println("Looking for cycles in " + graph.vertexSet().size() + " vertices" + ", " + graph.edgeSet().size() + " edges");
 		
 		for (V v : graph.vertexSet()) {
 			threadPoolExecutor.submit(new CycleFinder<>(graph, v, cycles));

@@ -65,4 +65,76 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testFailNoSpace() {
+		try {
+			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
+			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
+			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
+
+			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_fail_noSpace.ifc"));
+
+			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
+			
+			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
+			
+			Tester tester = new Tester();
+			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
+			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
+			System.out.println(json);
+			Assert.assertEquals(false, result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testFailSmallSpace() {
+		try {
+			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
+			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
+			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
+			
+			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_fail_smallSpace.ifc"));
+			
+			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
+			
+			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
+			
+			Tester tester = new Tester();
+			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
+			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
+			System.out.println(json);
+			Assert.assertEquals(false, result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testPass() {
+		try {
+			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
+			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
+			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
+			
+			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_pass.ifc"));
+			
+			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
+			
+			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
+			
+			Tester tester = new Tester();
+			boolean result = tester.test(model, "SPACES", "UNIDENTIFIED");
+			ObjectNode json = tester.getJsonValidationReport().toJson(JsonValidationReport.OBJECT_MAPPER);
+			System.out.println(json);
+			Assert.assertEquals(false, result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail(e.getMessage());
+		}
+	}
 }

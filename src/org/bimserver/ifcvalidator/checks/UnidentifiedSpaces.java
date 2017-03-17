@@ -8,6 +8,8 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,12 @@ import org.bimserver.validationreport.Type;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.Pseudograph;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UnidentifiedSpaces extends ModelCheck {
 	private final Map<IfcProduct, Area> generatedAreas = new HashMap<>();
@@ -127,11 +135,17 @@ public class UnidentifiedSpaces extends ModelCheck {
 							if (!graph.containsVertex(wall2)) {
 								graph.addVertex(wall2);
 							}
-							graph.addEdge(wall1, wall2, ifcRelConnectsPathElements);
+							if (!graph.addEdge(wall1, wall2, ifcRelConnectsPathElements)) {
+								System.out.println("Redundant edge not added");
+							}
 						}
 					}
 				}
 			}
+
+			writeToJson(ifcBuildingStorey, graph);
+			
+//			new Simplyfier().simplify(graph);
 
 			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
@@ -143,7 +157,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			}
 			
 			FindAllCyclesAlgo<IfcBuildingElementWrapper, IfcRelConnectsPathElements> algorighm = new FindAllCyclesAlgo<>(graph);
-			List<Set<IfcBuildingElementWrapper>> findSimpleCycles = algorighm.findAllCycles();
+			List<Set<IfcBuildingElementWrapper>> findSimpleCycles = new ArrayList<>();//.findAllCycles();
 			
 			double scaleX = 1600 / totalArea.getBounds().getWidth();
 			double scaleY = 1600 / totalArea.getBounds().getHeight();
@@ -386,6 +400,38 @@ public class UnidentifiedSpaces extends ModelCheck {
 		return false;
 	}
 	
+	private void writeToJson(IfcBuildingStorey ifcBuildingStorey, Pseudograph<IfcBuildingElementWrapper, IfcRelConnectsPathElements> graph) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode graphJson = objectMapper.createObjectNode();
+
+		ArrayNode vertices = objectMapper.createArrayNode();
+		ArrayNode edges = objectMapper.createArrayNode();
+		
+		graphJson.set("vertices", vertices);
+		graphJson.set("edges", edges);
+		
+		for (IfcBuildingElementWrapper ifcBuildingElementWrapper : graph.vertexSet()) {
+			vertices.add(ifcBuildingElementWrapper.get().getOid());
+		}
+		for (IfcRelConnectsPathElements ifcRelConnectsPathElements : graph.edgeSet()) {
+			ObjectNode edgeJson = objectMapper.createObjectNode();
+			edgeJson.put("id", ifcRelConnectsPathElements.getOid());
+			edgeJson.put("from", ifcRelConnectsPathElements.getRelatedElement().getOid());
+			edgeJson.put("to", ifcRelConnectsPathElements.getRelatingElement().getOid());
+			edges.add(edgeJson);
+		}
+		
+		try {
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(ifcBuildingStorey.getName() + ".graph.json"), graphJson);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private BufferedImage renderImage(IfcBuildingStorey ifcBuildingStorey, Area totalArea, Path2D.Float newPath) {
 		BufferedImage bufferedImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();

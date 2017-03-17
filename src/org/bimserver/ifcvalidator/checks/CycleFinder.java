@@ -1,7 +1,6 @@
 package org.bimserver.ifcvalidator.checks;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 
