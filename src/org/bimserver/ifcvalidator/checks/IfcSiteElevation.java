@@ -19,13 +19,11 @@ public class IfcSiteElevation extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
-		boolean valid = sites.size() > 0;
-		for (IfcSite ifcSite : model.getAll(IfcSite.class)) {
+		for (IfcSite ifcSite : sites) {
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefElevation())) {
 				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefElevation").is(ifcSite.getRefElevation()).shouldBe("Not null").add();
 			} else {
 				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefElevation").is(null).shouldBe("Not null").add();
-				valid = false;
 			}
 		}
 	}

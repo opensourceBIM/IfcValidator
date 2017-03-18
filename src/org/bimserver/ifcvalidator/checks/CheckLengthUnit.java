@@ -21,7 +21,6 @@ public class CheckLengthUnit extends ModelCheck {
 
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
-		boolean valid = false;
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
 	
@@ -35,11 +34,8 @@ public class CheckLengthUnit extends ModelCheck {
 						boolean metres = ifcSIUnit.getName() == IfcSIUnitName.METRE;
 						boolean rightPrefix = ifcSIUnit.getPrefix() == IfcSIPrefix.MILLI || ifcSIUnit.getPrefix() == IfcSIPrefix.NULL;
 						issueContainer.builder().type(lengthUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Length unit definition").is(lengthUnitFound).shouldBe("Found").add();
-
 						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Length unit").is(lengthUnitFound).shouldBe("Metres").add();
 						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Length unit prefix").is(lengthUnitFound).shouldBe("None or millis").add();
-
-						valid = lengthUnitFound && metres && rightPrefix;
 					}
 				}
 			}

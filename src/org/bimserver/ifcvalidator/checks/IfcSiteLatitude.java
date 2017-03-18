@@ -19,7 +19,6 @@ public class IfcSiteLatitude extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
-		boolean valid = sites.size() > 0;
 		for (IfcSite ifcSite : sites) {
 			// Only checking whether this data is available
 			
@@ -28,7 +27,6 @@ public class IfcSiteLatitude extends ModelCheck {
 				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefLatitude").is(ifcSite.getRefLatitude()).shouldBe("Not null").add();
 			} else {
 				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefLatitude").is(null).shouldBe("Not null").add();
-				valid = false;
 			}
 		}
 	}

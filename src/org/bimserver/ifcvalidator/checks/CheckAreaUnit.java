@@ -21,7 +21,6 @@ public class CheckAreaUnit extends ModelCheck {
 
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
-		boolean valid = false;
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
 	
@@ -37,7 +36,6 @@ public class CheckAreaUnit extends ModelCheck {
 						issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
 						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit").is(metres).shouldBe("Metres squared").add();
 						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
-						valid = areaUnitFound && metres && rightPrefix;
 					}
 				}
 			}

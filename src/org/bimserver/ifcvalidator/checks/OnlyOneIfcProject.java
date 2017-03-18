@@ -19,6 +19,6 @@ public class OnlyOneIfcProject extends ModelCheck {
 		
 		IfcProject ifcProject = projects.size() == 1 ? projects.get(0) : null;
 		issueContainer.builder().type(projects.size() == 1 ? Type.SUCCESS : Type.ERROR)
-		.object(ifcProject).message(translator.translate("NUMBER_OF_PROJECTS")).is(projects.size() + " " + translator.translate(projects.size() == 1 ? "PROJECT" : "PROJECTS")).shouldBe(translator.translate("EXACTLY_ONE_PROJECT")).add();;
+		.object(ifcProject).message(translator.translate("NUMBER_OF_PROJECTS")).is(projects.size() + " " + translator.translate(projects.size() == 1 ? "PROJECT" : "PROJECTS")).shouldBe(translator.translate("EXACTLY_ONE_PROJECT")).add();
 	}
 }

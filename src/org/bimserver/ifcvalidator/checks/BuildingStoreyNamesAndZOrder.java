@@ -25,8 +25,6 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 //		int nrBuildingStoreys = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuildingStorey());
 //		issueContainer.add(nrBuildingStoreys > 0 ? Type.SUCCESS : Type.ERROR, null, null, -1, "Number of building storeys", nrBuildingStoreys + " IfcBuildingStorey objects", "> 0 IfcBuildingStorey objects");
 		
-		boolean valid = true;
-		
 		Map<Integer, IfcBuildingStorey> mapped = new TreeMap<>();
 		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
 			String name = ifcBuildingStorey.getName();
@@ -40,7 +38,6 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 						int storeyNumber = Integer.parseInt(number);
 						if (mapped.containsKey(storeyNumber)) {
 							issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Duplicate storey name").is(ifcBuildingStorey.getName()).shouldBe("").add();
-							valid = false;
 						} else {
 							mapped.put(storeyNumber, ifcBuildingStorey);
 							issueContainer.builder().type(Type.SUCCESS).object(ifcBuildingStorey).message("Valid building name").is(ifcBuildingStorey.getName()).shouldBe("").add();
@@ -48,11 +45,9 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 					}
 				} catch (NumberFormatException e) {
 					issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Invalid building name, invalid number " + split[0]).is(ifcBuildingStorey.getName()).shouldBe("").add();
-					valid = false;
 				}
 			} else {
 				issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Invalid building name, no spaces").is(ifcBuildingStorey.getName()).shouldBe("").add();
-				valid = false;
 			}
 		}
 		if (mapped.size() > 1) {
@@ -83,7 +78,6 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 				} else {
 					increasingWithHeight = false;
 					issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Building storey " + getObjectIdentifier(ifcBuildingStorey) + " seems to be lower than " + getObjectIdentifier(lastStorey)).is(ifcBuildingStorey.getName()).shouldBe("").add();
-					valid = false;
 				}
 			}
 			if (increasingWithHeight) {

@@ -19,8 +19,7 @@ public class IfcSiteLongitude extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
-		boolean valid = sites.size() > 0;
-		for (IfcSite ifcSite : model.getAll(IfcSite.class)) {
+		for (IfcSite ifcSite : sites) {
 			// Only checking whether this data is available
 			
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefLongitude())) {
@@ -28,7 +27,6 @@ public class IfcSiteLongitude extends ModelCheck {
 				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefLongitude").is(ifcSite.getRefLongitude()).shouldBe("Not null").add();
 			} else {
 				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefLongitude").is(null).shouldBe("Not null").add();
-				valid = false;
 			}
 		}
 	}

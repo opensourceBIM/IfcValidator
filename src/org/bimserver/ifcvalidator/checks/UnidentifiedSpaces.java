@@ -31,7 +31,6 @@ import org.bimserver.models.ifc2x3tc1.IfcWall;
 import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
-import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.Type;

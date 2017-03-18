@@ -45,7 +45,7 @@ public class HasTrueNorthSet extends ModelCheck {
 					Joiner joiner = Joiner.on(", ").skipNulls();
 					stringVersion = joiner.join(trueNorth.getDirectionRatios());
 				}
-				issueContainer.builder().type(trueNorth != null ? Type.SUCCESS : Type.ERROR).message(translator.translate("TRUE_NORTH_SET")).is(stringVersion).shouldBe(translator.translate("SET")).add();
+				issueContainer.builder().type(trueNorth != null ? Type.SUCCESS : Type.ERROR).object(context).message(translator.translate("TRUE_NORTH_SET")).is(stringVersion).shouldBe(translator.translate("SET")).add();
 			}
 		}
 	}

@@ -36,7 +36,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 			}
 		}
 		if (ok) {
-			issueContainer.builder().type(Type.SUCCESS).message(translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY")).is(translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY")).shouldBe(translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2")).add();;
+			issueContainer.builder().type(Type.SUCCESS).message(translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY")).is(translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY")).shouldBe(translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2")).add();
 		}
 	}
 }
