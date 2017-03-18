@@ -4,6 +4,7 @@ import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.Translator;
 import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.geometry.Vector3f;
+import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcElement;
 import org.bimserver.models.ifc2x3tc1.IfcFeatureElementSubtraction;
 import org.bimserver.models.ifc2x3tc1.IfcOpeningElement;
@@ -30,6 +31,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
+			IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 			double totalWindowArea = 0;
 			int nrWindowsUsed = 0;
 			for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
@@ -52,7 +54,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 											windowGeometry.getMaxBoundsUntranslated();
 											double geometryArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
 											if (Math.abs(geometryArea - semanticArea) > 0.001) {
-												issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Window area of geometry not consistent with semantic area (OverallWidth*OverallHeight)").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometryArea))).add();
+												issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Window area of geometry not consistent with semantic area (OverallWidth*OverallHeight)").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometryArea))).buildingStorey(ifcBuildingStorey).add();
 											} else {
 												totalWindowArea += geometryArea;
 												nrWindowsUsed++;
@@ -66,13 +68,13 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 			if (nrWindowsUsed == 0) {
-				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"");
+				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
 			} else {
 				if (ifcSpace.getGeometry() != null) {
 					if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea())).add();
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea())).buildingStorey(ifcBuildingStorey).add();
 					} else {
-						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea()));
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea())).buildingStorey(ifcBuildingStorey).add();
 					}
 				}
 			}
