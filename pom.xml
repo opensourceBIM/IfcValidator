@@ -161,7 +161,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.70-SNAPSHOT</version>
+			<version>1.5.70</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
