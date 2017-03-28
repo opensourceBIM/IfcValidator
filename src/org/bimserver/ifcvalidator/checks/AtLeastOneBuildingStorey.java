@@ -3,7 +3,7 @@ package org.bimserver.ifcvalidator.checks;
 import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
@@ -16,7 +16,7 @@ public class AtLeastOneBuildingStorey extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		List<IfcBuildingStorey> buildingStories = model.getAll(IfcBuildingStorey.class);
 		int size = buildingStories.size();
 		IfcBuildingStorey buildingStorey = size == 1 ? buildingStories.get(0) : null;
@@ -25,9 +25,9 @@ public class AtLeastOneBuildingStorey extends ModelCheck {
 		issueContainer.builder().
 			type(valid ? Type.SUCCESS : Type.ERROR).
 			object(buildingStorey).
-			message(translator.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS")).
-			is(size + " " + translator.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS")).
-			shouldBe(translator.translate("ATLEAST_ONE_BUILDING_STOREY")).
+			message(checkerContext.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS")).
+			is(size + " " + checkerContext.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS")).
+			shouldBe(checkerContext.translate("ATLEAST_ONE_BUILDING_STOREY")).
 			add();
 	}
 }

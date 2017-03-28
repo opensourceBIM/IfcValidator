@@ -23,6 +23,10 @@
 				<directory>templates</directory>
 			</resource>
 			<resource>
+				<targetPath>input</targetPath>
+				<directory>input</directory>
+			</resource>
+			<resource>
 				<targetPath>.</targetPath>
 				<directory>.</directory>
 				<includes>

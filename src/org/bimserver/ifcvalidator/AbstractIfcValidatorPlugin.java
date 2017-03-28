@@ -41,7 +41,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		super.init(pluginContext);
 	}
 	
-	protected abstract IssueContainerSerializer createIssueInterface(Translator translator);
+	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
 
 	@Override
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
@@ -58,9 +58,10 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
 		Properties properties = new Properties();
 		properties.load(Files.newInputStream(propertiesFile));
-		Translator translator = new Translator(filename, properties);
 		
-		IssueContainerSerializer issueContainerSerializer = createIssueInterface(translator);
+		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
+		
+		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
 		IssueContainer issueContainer = new IssueContainer();
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			boolean headerAdded = false;
@@ -72,7 +73,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 //							issueContainerSerializer.addHeader(translator.translate(groupIdentifier + "_HEADER"));
 //						}
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-						modelCheck.check(model, issueContainer, translator);
+						modelCheck.check(model, issueContainer, checkerContext);
 					}
 				}
 			}
@@ -130,7 +131,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Translator translator = new Translator(filename, properties);
+		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
 		
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
@@ -138,11 +139,11 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 				ParameterDefinition parameter = StoreFactory.eINSTANCE.createParameterDefinition();
 				parameter.setIdentifier(groupIdentifier + "___" + identifier);
-				parameter.setName(modelCheck.getName(translator));
+				parameter.setName(modelCheck.getName(checkerContext));
 				parameter.setType(booleanType);
 				parameter.setRequired(true);
 				parameter.setDefaultValue(modelCheck.isEnabledByDefault() ? trueValue : falseValue);
-				parameter.setDescription(modelCheck.getDescription(translator));
+				parameter.setDescription(modelCheck.getDescription(checkerContext));
 				objectDefinition.getParameters().add(parameter);
 			}
 		}

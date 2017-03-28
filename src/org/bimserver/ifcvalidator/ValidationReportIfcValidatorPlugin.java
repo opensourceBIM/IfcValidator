@@ -10,7 +10,7 @@ public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlug
 	}
 
 	@Override
-	protected IssueContainerSerializer createIssueInterface(Translator translator) {
+	protected IssueContainerSerializer createIssueInterface(CheckerContext translator) {
 		return new JsonValidationReport();
 	}
 

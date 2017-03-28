@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.geometry.Vector3f;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
@@ -21,7 +21,7 @@ public class BuildingStoreyNamesAndZOrder extends ModelCheck {
 	}
 	
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 //		int nrBuildingStoreys = model.count(Ifc2x3tc1Package.eINSTANCE.getIfcBuildingStorey());
 //		issueContainer.add(nrBuildingStoreys > 0 ? Type.SUCCESS : Type.ERROR, null, null, -1, "Number of building storeys", nrBuildingStoreys + " IfcBuildingStorey objects", "> 0 IfcBuildingStorey objects");
 		

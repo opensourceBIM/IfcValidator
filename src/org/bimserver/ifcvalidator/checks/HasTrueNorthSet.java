@@ -3,7 +3,7 @@ package org.bimserver.ifcvalidator.checks;
 import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcDirection;
 import org.bimserver.models.ifc2x3tc1.IfcGeometricRepresentationContext;
 import org.bimserver.models.ifc2x3tc1.IfcProject;
@@ -22,12 +22,12 @@ public class HasTrueNorthSet extends ModelCheck {
 	}
 	
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		List<IfcProject> projects = model.getAll(IfcProject.class);
 		for (IfcProject ifcProject : projects) {
 			EList<IfcRepresentationContext> representationContexts = ifcProject.getRepresentationContexts();
 			if (representationContexts.isEmpty()) {
-				issueContainer.builder().type(Type.ERROR).object(ifcProject).message(translator.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS")).is("0").shouldBe("> 0").add();
+				issueContainer.builder().type(Type.ERROR).object(ifcProject).message(checkerContext.translate("IFC_PROJECT_NUMBER_OF_REPRESENTATION_CONTEXTS")).is("0").shouldBe("> 0").add();
 			} else {
 				IfcDirection trueNorth = null;
 				IfcGeometricRepresentationContext context = null;
@@ -45,7 +45,7 @@ public class HasTrueNorthSet extends ModelCheck {
 					Joiner joiner = Joiner.on(", ").skipNulls();
 					stringVersion = joiner.join(trueNorth.getDirectionRatios());
 				}
-				issueContainer.builder().type(trueNorth != null ? Type.SUCCESS : Type.ERROR).object(context).message(translator.translate("TRUE_NORTH_SET")).is(stringVersion).shouldBe(translator.translate("SET")).add();
+				issueContainer.builder().type(trueNorth != null ? Type.SUCCESS : Type.ERROR).object(context).message(checkerContext.translate("TRUE_NORTH_SET")).is(stringVersion).shouldBe(checkerContext.translate("SET")).add();
 			}
 		}
 	}

@@ -9,7 +9,7 @@ public class ExcelIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 	}
 
 	@Override
-	protected IssueContainerSerializer createIssueInterface(Translator translator) {
+	protected IssueContainerSerializer createIssueInterface(CheckerContext translator) {
 		return new ExcelIssueInterface(translator);
 	}
 

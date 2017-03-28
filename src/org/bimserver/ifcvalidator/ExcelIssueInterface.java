@@ -34,10 +34,10 @@ public class ExcelIssueInterface implements IssueContainerSerializer {
 	private int row;
 	private WritableCellFormat error;
 	private WritableCellFormat ok;
-	private Translator translator;
+	private CheckerContext translator;
 	private WorkbookSettings wbSettings;
 
-	public ExcelIssueInterface(Translator translator) {
+	public ExcelIssueInterface(CheckerContext translator) {
 	    this.translator = translator;
 		try {
 	    	wbSettings = new WorkbookSettings();
@@ -65,7 +65,7 @@ public class ExcelIssueInterface implements IssueContainerSerializer {
 		}
 	}
 
-	private void init(Translator translator, WorkbookSettings wbSettings) throws IOException, WriteException, RowsExceededException {
+	private void init(CheckerContext translator, WorkbookSettings wbSettings) throws IOException, WriteException, RowsExceededException {
 		byteArrayOutputStream = new ByteArrayOutputStream();
 		workbook = Workbook.createWorkbook(byteArrayOutputStream, wbSettings);
 		

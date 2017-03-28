@@ -3,7 +3,7 @@ package org.bimserver.ifcvalidator.checks;
 import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcBuilding;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcOpeningElement;
@@ -21,7 +21,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		boolean ok = true;
 		List<IfcProduct> products = model.getAllWithSubTypes(IfcProduct.class);
 		for (IfcProduct ifcProduct : products) {
@@ -36,7 +36,7 @@ public class AllObjectsInBuildingStorey extends ModelCheck {
 			}
 		}
 		if (ok) {
-			issueContainer.builder().type(Type.SUCCESS).message(translator.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY")).is(translator.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY")).shouldBe(translator.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + translator.translate("ALL_OBJECTS_LINKED2")).add();
+			issueContainer.builder().type(Type.SUCCESS).message(checkerContext.translate("ALL_OBJECTS_MUST_BE_LINKED_TO_A_BUILDING_STOREY")).is(checkerContext.translate("ALL_OBJECTS_LINKED_TO_BUILDING_STOREY")).shouldBe(checkerContext.translate("ALL_OBJECT_LINKED1") + " "+ products.size() + " " + checkerContext.translate("ALL_OBJECTS_LINKED2")).add();
 		}
 	}
 }

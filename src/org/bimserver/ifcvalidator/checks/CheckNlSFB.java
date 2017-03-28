@@ -1,7 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
 
@@ -12,6 +12,6 @@ public class CheckNlSFB extends ModelCheck  {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 	}
 }

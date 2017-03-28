@@ -9,7 +9,7 @@ public class BcfIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 	}
 
 	@Override
-	protected IssueContainerSerializer createIssueInterface(Translator translator) {
+	protected IssueContainerSerializer createIssueInterface(CheckerContext translator) {
 		return new BcfInterface(translator);
 	}
 

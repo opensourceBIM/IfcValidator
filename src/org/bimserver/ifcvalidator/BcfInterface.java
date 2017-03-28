@@ -31,7 +31,7 @@ public class BcfInterface implements IssueContainerSerializer {
 
 	private BcfFile bcfFile;
 
-	public BcfInterface(Translator translator) {
+	public BcfInterface(CheckerContext translator) {
 		bcfFile = new BcfFile();
 	}
 	

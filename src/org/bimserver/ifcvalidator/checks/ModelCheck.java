@@ -1,7 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
@@ -11,7 +11,7 @@ public abstract class ModelCheck {
 	private String identifier;
 	private String groupIdentifier;
 
-	public abstract void check(IfcModelInterface model, IssueContainer issueContainer, org.bimserver.ifcvalidator.Translator translator) throws IssueException;
+	public abstract void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException;
 
 	public String getIdentifier() {
 		return identifier;
@@ -41,7 +41,7 @@ public abstract class ModelCheck {
 		return ifcProduct.eClass().getName() + " " + ifcProduct.getOid();
 	}
 	
-	public String getDescription(Translator translator ) {
+	public String getDescription(CheckerContext translator ) {
 		return translator.translate(identifier + "_DESCRIPTION");
 	}
 
@@ -49,7 +49,7 @@ public abstract class ModelCheck {
 		return true;
 	}
 
-	public String getName(Translator translator) {
+	public String getName(CheckerContext translator) {
 		return translator.translate(identifier + "_NAME");
 	}
 }

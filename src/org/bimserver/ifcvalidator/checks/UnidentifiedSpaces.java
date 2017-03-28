@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingElement;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcCurtainWall;
@@ -74,8 +74,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 	}
 	
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
-		Random random = new Random();
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		boolean debug = false;
 		boolean removeAllWalls = true;
 		lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
@@ -83,8 +82,6 @@ public class UnidentifiedSpaces extends ModelCheck {
 		System.out.println(model.getAll(IfcRelConnectsPathElements.class).size() + " IfcRelConnectsPathElements found");
 
 		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
-			System.out.println(ifcBuildingStorey.getName());
-			
 			BufferedImage image = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D graphics = (Graphics2D) image.getGraphics();
 			

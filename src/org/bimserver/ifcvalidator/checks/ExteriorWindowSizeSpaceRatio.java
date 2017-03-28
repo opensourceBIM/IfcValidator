@@ -1,7 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.geometry.Vector3f;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
@@ -29,7 +29,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
 			IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 			double totalWindowArea = 0;

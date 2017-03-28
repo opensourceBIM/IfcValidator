@@ -3,7 +3,7 @@ package org.bimserver.ifcvalidator.checks;
 import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
 import org.bimserver.validationreport.IssueContainer;
@@ -17,7 +17,7 @@ public class IfcSiteElevation extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		for (IfcSite ifcSite : sites) {
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefElevation())) {

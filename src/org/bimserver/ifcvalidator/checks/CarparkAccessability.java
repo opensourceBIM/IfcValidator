@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
@@ -103,7 +103,7 @@ public class CarparkAccessability extends ModelCheck {
 	}
 	
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		scaleToMm = IfcUtils.getLengthUnitPrefix(model);
 		int regularSpaces = 0;
 		int handicappedSpaces = 0;

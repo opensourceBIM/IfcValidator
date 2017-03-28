@@ -1,7 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.Translator;
+import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcProject;
 import org.bimserver.models.ifc2x3tc1.IfcSIPrefix;
 import org.bimserver.models.ifc2x3tc1.IfcSIUnit;
@@ -20,7 +20,7 @@ public class CheckLengthUnit extends ModelCheck {
 	}
 
 	@Override
-	public void check(IfcModelInterface model, IssueContainer issueContainer, Translator translator) throws IssueException {
+	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		for (IfcProject ifcProject : model.getAll(IfcProject.class)) {
 			IfcUnitAssignment unitsInContext = ifcProject.getUnitsInContext();
 	

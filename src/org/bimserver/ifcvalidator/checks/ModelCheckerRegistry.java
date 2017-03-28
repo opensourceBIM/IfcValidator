@@ -38,6 +38,7 @@ public class ModelCheckerRegistry {
 		addCheck(new CarparkAccessability(new CarparkAccessibilityConfiguration()));
 		addCheck(new ExteriorWindowSizeSpaceRatio(new WindowSpaceRatioConfiguration()));
 		addCheck(new UnidentifiedSpaces());
+		addCheck(new UnclassifiedSpaces());
 
 		addCheck(new AllObjectsInBuildingStorey());
 		
