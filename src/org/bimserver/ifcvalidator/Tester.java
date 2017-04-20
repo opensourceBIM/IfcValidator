@@ -19,17 +19,17 @@ package org.bimserver.ifcvalidator;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.checks.ModelCheck;
-import org.bimserver.ifcvalidator.checks.ModelCheckerRegistry;
+import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
 
 public class Tester {
-	private ModelCheckerRegistry modelCheckerRegistry;
+	private FullModelCheckerRegistry modelCheckerRegistry;
 	private IssueContainer issueContainer;
 
 	public Tester() {
 		issueContainer = new IssueContainer();
-		modelCheckerRegistry = new ModelCheckerRegistry();
+		modelCheckerRegistry = new FullModelCheckerRegistry();
 	}
 	
 	public void test(IfcModelInterface model, String groupIdentifier, String identifier) {

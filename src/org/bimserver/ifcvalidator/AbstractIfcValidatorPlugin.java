@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.bimserver.emf.IfcModelInterface;
+import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.ifcvalidator.checks.ModelCheckerRegistry;
 import org.bimserver.interfaces.objects.SObjectType;
@@ -47,11 +48,10 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	private final ModelCheckerRegistry modelCheckerRegistry;
 	private boolean generateExtendedDataPerCheck = false;
 
-	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck) {
+	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck, ModelCheckerRegistry modelCheckerRegistry) {
 		super(namespace);
 		this.generateExtendedDataPerCheck = generateExtendedDataPerCheck;
-		
-		modelCheckerRegistry = new ModelCheckerRegistry();
+		this.modelCheckerRegistry = modelCheckerRegistry;
 	}
 	
 	@Override

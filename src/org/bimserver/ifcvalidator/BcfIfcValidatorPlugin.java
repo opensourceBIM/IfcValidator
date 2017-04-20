@@ -1,5 +1,7 @@
 package org.bimserver.ifcvalidator;
 
+import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
+
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
  * 
@@ -22,7 +24,7 @@ import org.bimserver.validationreport.IssueContainerSerializer;
 public class BcfIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public BcfIfcValidatorPlugin() {
-		super("BCF_ZIP_2_0", false);
+		super("BCF_ZIP_2_0", false, new FullModelCheckerRegistry());
 	}
 
 	@Override

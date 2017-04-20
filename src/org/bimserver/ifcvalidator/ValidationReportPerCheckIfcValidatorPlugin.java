@@ -1,5 +1,8 @@
 package org.bimserver.ifcvalidator;
 
+import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
+import org.bimserver.ifcvalidator.checks.LimitedModelCheckerRegistry;
+
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
  * 
@@ -23,7 +26,7 @@ import org.bimserver.validationreport.JsonValidationReport;
 public class ValidationReportPerCheckIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public ValidationReportPerCheckIfcValidatorPlugin() {
-		super("VALIDATION_JSON_1_0", true);
+		super("VALIDATION_JSON_1_0", true, new LimitedModelCheckerRegistry());
 	}
 
 	@Override
