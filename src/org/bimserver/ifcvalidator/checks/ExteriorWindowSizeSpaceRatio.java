@@ -85,7 +85,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 			if (nrWindowsUsed == 0) {
-				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
+//				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
 			} else {
 				if (ifcSpace.getGeometry() != null) {
 					if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
