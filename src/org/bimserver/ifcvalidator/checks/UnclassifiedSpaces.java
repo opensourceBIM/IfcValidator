@@ -25,7 +25,7 @@ public class UnclassifiedSpaces extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		Set<String> availableClasses = new HashSet<>();
-		try (Scanner scanner = new Scanner(checkerContext.getResource("omniclass14.txt"))) {
+		try (Scanner scanner = new Scanner(checkerContext.getResource("omniclass13.txt"))) {
 			while (scanner.hasNext()) {
 				availableClasses.add(scanner.nextLine());
 			}
@@ -41,12 +41,12 @@ public class UnclassifiedSpaces extends ModelCheck {
 					IfcClassificationReference ifcClassificationReference = (IfcClassificationReference)ifcClassificationNotationSelect;
 					if (availableClasses.contains(((IfcClassificationReference) ifcClassificationNotationSelect).getItemReference())) {
 						valid = true;
-						issueContainer.builder().object(ifcSpace).message("IfcSpace classified with valid OmniClass").type(Type.SUCCESS).is(ifcClassificationReference.getItemReference()).shouldBe("OmniClass Table 14").add();
+						issueContainer.builder().object(ifcSpace).message("IfcSpace classified with valid OmniClass").type(Type.SUCCESS).is(ifcClassificationReference.getItemReference()).shouldBe("OmniClass Table 13").add();
 					}
 				}
 			}
 			if (!valid) {
-				issueContainer.builder().object(ifcSpace).message("IfcSpace not classified with valid OmniClass").type(Type.ERROR).shouldBe("OmniClass Table 14").add();
+				issueContainer.builder().object(ifcSpace).message("IfcSpace not classified with valid OmniClass").type(Type.ERROR).shouldBe("OmniClass Table 13").add();
 			}
 		}
 	}
