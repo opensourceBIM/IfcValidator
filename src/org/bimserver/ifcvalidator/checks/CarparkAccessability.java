@@ -170,18 +170,18 @@ public class CarparkAccessability extends ModelCheck {
 		}
 		if (unidentifiedSpaces > 0) {
 //			issueContainer.add(Type.ERROR, "The amount of unidentified spaces is too high", "" + unidentifiedSpaces, "" + 0);
-			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified spaces is too high").add();
+			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified spaces is too high").is(unidentifiedSpaces).shouldBe(0).add();
 		}
 		if (unidentifiedCarparks > 0) {
-			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified carparks is too high").add();
+			issueContainer.builder().type(Type.ERROR).message("The amount of unidentified carparks is too high").is(unidentifiedCarparks).shouldBe(0).add();
 //			issueContainer.add(Type.ERROR, "The amount of unidentified carparks is too high", "" + unidentifiedCarparks, "" + 0);
 		}
 		if (regularSpaces > handicappedSpaces * conf.getRatioHandicappedToRegularParking()) {
-			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").add();
+			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").is(handicappedSpaces).shouldBe(regularSpaces / conf.getRatioHandicappedToRegularParking()).add();
 //			issueContainer.add(Type.ERROR, "The amount of handicapped carparks should be higher", "" + handicappedSpaces, "" + (regularSpaces / conf.getRatioHandicappedToRegularParking()));
 		}
 		if (totalCarparks == 0) {
-			issueContainer.builder().type(Type.CANNOT_CHECK).message("No carparks found, not checking").add();
+			issueContainer.builder().type(Type.CANNOT_CHECK).message("No carparks found, not checking").is(0).shouldBe("not 0").add();
 //			issueContainer.add(Type.CANNOT_CHECK, "No carparks found, not checking", "0", "> 0");
 		}
 	}
