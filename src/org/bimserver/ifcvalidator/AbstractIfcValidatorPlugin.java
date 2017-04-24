@@ -1,10 +1,29 @@
 package org.bimserver.ifcvalidator;
+
+/******************************************************************************
+ * Copyright (C) 2009-2017  BIMserver.org
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
+ *****************************************************************************/
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
 import org.bimserver.emf.IfcModelInterface;
+import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.ifcvalidator.checks.ModelCheckerRegistry;
 import org.bimserver.interfaces.objects.SObjectType;
@@ -29,11 +48,10 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	private final ModelCheckerRegistry modelCheckerRegistry;
 	private boolean generateExtendedDataPerCheck = false;
 
-	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck) {
+	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck, ModelCheckerRegistry modelCheckerRegistry) {
 		super(namespace);
 		this.generateExtendedDataPerCheck = generateExtendedDataPerCheck;
-		
-		modelCheckerRegistry = new ModelCheckerRegistry();
+		this.modelCheckerRegistry = modelCheckerRegistry;
 	}
 	
 	@Override
