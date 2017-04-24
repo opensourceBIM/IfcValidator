@@ -68,12 +68,11 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 										double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight();
 										GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
 										if (windowGeometry != null) {
-											windowGeometry.getMaxBoundsUntranslated();
-											double geometryArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
-											if (Math.abs(geometryArea - semanticArea) > 0.001) {
-												issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Window area of geometry not consistent with semantic area (OverallWidth*OverallHeight)").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometryArea))).buildingStorey(ifcBuildingStorey).add();
+											double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
+											if (semanticArea - geometricArea > 0.001) {
+												issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
 											} else {
-												totalWindowArea += geometryArea;
+												totalWindowArea += semanticArea;
 												nrWindowsUsed++;
 											}
 										}
@@ -85,7 +84,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 			if (nrWindowsUsed == 0) {
-//				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
+				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
 			} else {
 				if (ifcSpace.getGeometry() != null) {
 					if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
