@@ -128,7 +128,7 @@ public class CarparkAccessability extends ModelCheck {
 		int unidentifiedSpaces = 0;
 		int totalCarparks = 0;
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
-			if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
+			if ((ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking"))) {
 				totalCarparks++;
 				CarparkVote psetVote = checkPset(ifcSpace);
 				CarparkVote geometryVote = checkGeometry(ifcSpace);
@@ -220,7 +220,7 @@ public class CarparkAccessability extends ModelCheck {
 
 	public CarparkVote checkPset(IfcSpace ifcSpace) {
 		CarparkVote carparkVote = new CarparkVote(CheckType.PSET);
-		if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equals("Parking")) {
+		if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
 			Map<String, Object> properties = IfcUtils.listProperties(ifcSpace, "Pset_SpaceParking");
 			if (properties.containsKey("HandicapAccessible")) {
 				if (properties.get("HandicapAccessible") == Boolean.TRUE) {
