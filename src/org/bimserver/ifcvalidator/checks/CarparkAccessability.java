@@ -24,6 +24,7 @@ import java.util.Map;
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
+import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
 import org.bimserver.validationreport.IssueContainer;
@@ -177,7 +178,7 @@ public class CarparkAccessability extends ModelCheck {
 //			issueContainer.add(Type.ERROR, "The amount of unidentified carparks is too high", "" + unidentifiedCarparks, "" + 0);
 		}
 		if (regularSpaces > handicappedSpaces * conf.getRatioHandicappedToRegularParking()) {
-			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").is(handicappedSpaces).shouldBe(regularSpaces / conf.getRatioHandicappedToRegularParking()).add();
+			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").is(handicappedSpaces).shouldBe(Math.ceil((double)regularSpaces / conf.getRatioHandicappedToRegularParking())).add();
 //			issueContainer.add(Type.ERROR, "The amount of handicapped carparks should be higher", "" + handicappedSpaces, "" + (regularSpaces / conf.getRatioHandicappedToRegularParking()));
 		}
 		if (totalCarparks == 0) {
@@ -223,7 +224,8 @@ public class CarparkAccessability extends ModelCheck {
 		if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
 			Map<String, Object> properties = IfcUtils.listProperties(ifcSpace, "Pset_SpaceParking");
 			if (properties.containsKey("HandicapAccessible")) {
-				if (properties.get("HandicapAccessible") == Boolean.TRUE) {
+				Object object = properties.get("HandicapAccessible");
+				if (object == Boolean.TRUE || object == Tristate.TRUE) {
 					carparkVote.setCarparkVoteType(CarparkVoteType.HANDICAPPED_CARPARK);
 				} else {
 					carparkVote.setCarparkVoteType(CarparkVoteType.REGULAR_CARPARK);
