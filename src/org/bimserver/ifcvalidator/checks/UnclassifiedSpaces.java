@@ -52,7 +52,8 @@ public class UnclassifiedSpaces extends ModelCheck {
 			e.printStackTrace();
 		}
 		
-		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
+		List<IfcSpace> spaces = model.getAll(IfcSpace.class);
+		for (IfcSpace ifcSpace : spaces) {
 			boolean valid = false;
 			List<IfcClassificationNotationSelect> classifications = IfcUtils.getClassifications(ifcSpace, model);
 			for (IfcClassificationNotationSelect ifcClassificationNotationSelect : classifications) {
@@ -60,7 +61,7 @@ public class UnclassifiedSpaces extends ModelCheck {
 					IfcClassificationReference ifcClassificationReference = (IfcClassificationReference)ifcClassificationNotationSelect;
 					if (availableClasses.contains(((IfcClassificationReference) ifcClassificationNotationSelect).getItemReference())) {
 						valid = true;
-						IssueBuilder builder = issueContainer.builder().object(ifcSpace).message("IfcSpace classified with valid OmniClass").type(Type.SUCCESS).is(ifcClassificationReference.getItemReference()).shouldBe("OmniClass Table 13");
+						IssueBuilder builder = issueContainer.builder().object(ifcSpace).message("IfcSpace classified with valid OmniClass table 13").type(Type.SUCCESS).is(ifcClassificationReference.getItemReference()).shouldBe("OmniClass Table 13");
 						IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 						if (ifcBuildingStorey != null) {
 							builder.buildingStorey(ifcBuildingStorey);
@@ -70,13 +71,17 @@ public class UnclassifiedSpaces extends ModelCheck {
 				}
 			}
 			if (!valid) {
-				IssueBuilder builder = issueContainer.builder().object(ifcSpace).message("IfcSpace not classified with valid OmniClass").type(Type.ERROR).shouldBe("OmniClass Table 13");
+				IssueBuilder builder = issueContainer.builder().object(ifcSpace).message("IfcSpace not classified with valid OmniClass table 13").type(Type.ERROR).shouldBe("OmniClass Table 13");
 				IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 				if (ifcBuildingStorey != null) {
 					builder.buildingStorey(ifcBuildingStorey);
 				}
 				builder.add();
 			}
+		}
+		if (spaces.isEmpty()) {
+			IssueBuilder builder = issueContainer.builder().message("No IfcSpace objects found").type(Type.CANNOT_CHECK);
+			builder.add();
 		}
 	}
 }
