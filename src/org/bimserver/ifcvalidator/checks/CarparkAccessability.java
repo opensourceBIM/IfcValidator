@@ -152,11 +152,11 @@ public class CarparkAccessability extends ModelCheck {
 				} else {
 					// Both checks do not agree
 					if (psetVote.carparkVoteType == CarparkVoteType.REGULAR_CARPARK) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
-						regularSpaces++;
+						issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
+//						regularSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.HANDICAPPED_CARPARK) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
-						handicappedSpaces++;
+						issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
+//						handicappedSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.NOT_A_CARPARK) {
 //					issueContainer.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is not a carpark according to " + mostCertain.getType(), "", "");
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_CARPARK) {
