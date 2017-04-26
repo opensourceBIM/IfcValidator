@@ -1,5 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
+import java.util.List;
+
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
  * 
@@ -47,6 +49,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
+		List<IfcSpace> spaces = model.getAll(IfcSpace.class);
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
 			if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
 				continue;
@@ -97,6 +100,9 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 					}
 				}
 			}
+		}
+		if (spaces.isEmpty()) {
+			issueContainer.builder().type(Type.CANNOT_CHECK).message("No IfcSpace objects found in model").add();
 		}
 	}
 	

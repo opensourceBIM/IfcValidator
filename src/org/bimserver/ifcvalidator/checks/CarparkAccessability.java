@@ -24,6 +24,7 @@ import java.util.Map;
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.CheckerContext;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
+import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
 import org.bimserver.validationreport.IssueContainer;
@@ -128,7 +129,7 @@ public class CarparkAccessability extends ModelCheck {
 		int unidentifiedSpaces = 0;
 		int totalCarparks = 0;
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
-			if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
+			if ((ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking"))) {
 				totalCarparks++;
 				CarparkVote psetVote = checkPset(ifcSpace);
 				CarparkVote geometryVote = checkGeometry(ifcSpace);
@@ -151,11 +152,11 @@ public class CarparkAccessability extends ModelCheck {
 				} else {
 					// Both checks do not agree
 					if (psetVote.carparkVoteType == CarparkVoteType.REGULAR_CARPARK) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
-						regularSpaces++;
+						issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("This is a regular carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
+//						regularSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.HANDICAPPED_CARPARK) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
-						handicappedSpaces++;
+						issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("This is a handicapped carpark according to " + psetVote.getType() + ", the geometry does not agree").add();
+//						handicappedSpaces++;
 					} else if (psetVote.carparkVoteType == CarparkVoteType.NOT_A_CARPARK) {
 //					issueContainer.add(Type.SUCCESS, ifcSpace.eClass().getName(), ifcSpace.getGlobalId(), ifcSpace.getOid(), "This is not a carpark according to " + mostCertain.getType(), "", "");
 					} else if (psetVote.carparkVoteType == CarparkVoteType.UNIDENTIFIED_CARPARK) {
@@ -177,7 +178,7 @@ public class CarparkAccessability extends ModelCheck {
 //			issueContainer.add(Type.ERROR, "The amount of unidentified carparks is too high", "" + unidentifiedCarparks, "" + 0);
 		}
 		if (regularSpaces > handicappedSpaces * conf.getRatioHandicappedToRegularParking()) {
-			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").is(handicappedSpaces).shouldBe(regularSpaces / conf.getRatioHandicappedToRegularParking()).add();
+			issueContainer.builder().type(Type.ERROR).message("The amount of handicapped carparks should be higher").is(handicappedSpaces).shouldBe(Math.ceil((double)regularSpaces / conf.getRatioHandicappedToRegularParking())).add();
 //			issueContainer.add(Type.ERROR, "The amount of handicapped carparks should be higher", "" + handicappedSpaces, "" + (regularSpaces / conf.getRatioHandicappedToRegularParking()));
 		}
 		if (totalCarparks == 0) {
@@ -220,10 +221,11 @@ public class CarparkAccessability extends ModelCheck {
 
 	public CarparkVote checkPset(IfcSpace ifcSpace) {
 		CarparkVote carparkVote = new CarparkVote(CheckType.PSET);
-		if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equals("Parking")) {
+		if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
 			Map<String, Object> properties = IfcUtils.listProperties(ifcSpace, "Pset_SpaceParking");
 			if (properties.containsKey("HandicapAccessible")) {
-				if (properties.get("HandicapAccessible") == Boolean.TRUE) {
+				Object object = properties.get("HandicapAccessible");
+				if (object == Boolean.TRUE || object == Tristate.TRUE) {
 					carparkVote.setCarparkVoteType(CarparkVoteType.HANDICAPPED_CARPARK);
 				} else {
 					carparkVote.setCarparkVoteType(CarparkVoteType.REGULAR_CARPARK);
