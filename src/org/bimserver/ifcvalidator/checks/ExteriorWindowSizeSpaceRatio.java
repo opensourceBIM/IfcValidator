@@ -57,6 +57,9 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 			double totalWindowArea = 0;
 			int nrWindowsUsed = 0;
+			
+			float lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
+			
 			for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
 				IfcElement relatedBuildingElement = ifcRelSpaceBoundary.getRelatedBuildingElement();
 				if (relatedBuildingElement != null) {
@@ -71,7 +74,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 									IfcWindow ifcWindow = (IfcWindow)relatedBuildingElement2;
 									boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
 									if (windowExternal || wallExternal) {
-										double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight();
+										double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight() * Math.pow(lengthUnitPrefix, 2);
 										GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
 										if (windowGeometry != null) {
 											double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
