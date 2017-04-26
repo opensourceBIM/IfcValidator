@@ -48,6 +48,9 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
+			if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
+				continue;
+			}
 			IfcBuildingStorey ifcBuildingStorey = IfcUtils.getIfcBuildingStorey(ifcSpace);
 			double totalWindowArea = 0;
 			int nrWindowsUsed = 0;
