@@ -18,7 +18,7 @@ package org.bimserver.ifcvalidator.checks;
  *****************************************************************************/
 
 public class WindowSpaceRatioConfiguration {
-	private int ratio = 5;
+	private int ratio = 20;
 
 	public int getRatio() {
 		return ratio;
