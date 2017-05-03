@@ -1,5 +1,7 @@
 package org.bimserver.ifcvalidator.checks;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.util.List;
 
 /******************************************************************************
@@ -33,6 +35,7 @@ import org.bimserver.models.ifc2x3tc1.IfcRelVoidsElement;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.models.ifc2x3tc1.IfcWindow;
 import org.bimserver.models.ifc2x3tc1.Tristate;
+import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
@@ -60,6 +63,21 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			
 			float lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
 			
+			Area space2D = IfcTools2D.get2D(ifcSpace, lengthUnitPrefix);
+			
+			
+			// Commented out and written below because we don't want to upgrade BIMserver at this point
+			//IfcTools2D.enlargeSlightlyInPlace(space2D, 1.1f);
+			
+			AffineTransform aLittleLarger = new AffineTransform();
+			double centerX = space2D.getBounds2D().getCenterX();
+			double centerY = space2D.getBounds2D().getCenterY();
+			aLittleLarger.translate(centerX, centerY);
+			aLittleLarger.scale(1.1f, 1.1f);
+			aLittleLarger.translate(-centerX, -centerY);
+			
+			space2D.transform(aLittleLarger);
+			
 			for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
 				IfcElement relatedBuildingElement = ifcRelSpaceBoundary.getRelatedBuildingElement();
 				if (relatedBuildingElement != null) {
@@ -72,17 +90,20 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 								IfcElement relatedBuildingElement2 = ifcRelFillsElement.getRelatedBuildingElement();
 								if (relatedBuildingElement2 instanceof IfcWindow) {
 									IfcWindow ifcWindow = (IfcWindow)relatedBuildingElement2;
-									boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
-									if (windowExternal || wallExternal) {
-										double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight() * Math.pow(lengthUnitPrefix, 2);
-										GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
-										if (windowGeometry != null) {
-											double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
-											if (semanticArea - geometricArea > 0.001) {
-												issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
-											} else {
-												totalWindowArea += semanticArea;
-												nrWindowsUsed++;
+									Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
+									if (IfcTools2D.containsAllPoints(space2D, window2D)) {
+										boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
+										if (windowExternal || wallExternal) {
+											double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight() * Math.pow(lengthUnitPrefix, 2);
+											GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
+											if (windowGeometry != null) {
+												double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
+												if (semanticArea - geometricArea > 0.001) {
+													issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
+												} else {
+													totalWindowArea += semanticArea;
+													nrWindowsUsed++;
+												}
 											}
 										}
 									}
