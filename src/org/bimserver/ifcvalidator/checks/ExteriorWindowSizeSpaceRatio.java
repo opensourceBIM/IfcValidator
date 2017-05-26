@@ -2,7 +2,9 @@ package org.bimserver.ifcvalidator.checks;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
@@ -33,6 +35,7 @@ import org.bimserver.models.ifc2x3tc1.IfcRelFillsElement;
 import org.bimserver.models.ifc2x3tc1.IfcRelSpaceBoundary;
 import org.bimserver.models.ifc2x3tc1.IfcRelVoidsElement;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
+import org.bimserver.models.ifc2x3tc1.IfcWall;
 import org.bimserver.models.ifc2x3tc1.IfcWindow;
 import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.utils.IfcTools2D;
@@ -78,49 +81,42 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			
 			space2D.transform(aLittleLarger);
 			
-			for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
-				IfcElement relatedBuildingElement = ifcRelSpaceBoundary.getRelatedBuildingElement();
-				if (relatedBuildingElement != null) {
-					boolean wallExternal = IfcUtils.getBooleanProperty(relatedBuildingElement, "IsExternal") == Tristate.TRUE;
-					for (IfcRelVoidsElement ifcRelVoidsElement : relatedBuildingElement.getHasOpenings()) {
-						IfcFeatureElementSubtraction relatedOpeningElement = ifcRelVoidsElement.getRelatedOpeningElement();
-						if (relatedOpeningElement instanceof IfcOpeningElement) {
-							IfcOpeningElement ifcOpeningElement = (IfcOpeningElement)relatedOpeningElement;
-							for (IfcRelFillsElement ifcRelFillsElement : ifcOpeningElement.getHasFillings()) {
-								IfcElement relatedBuildingElement2 = ifcRelFillsElement.getRelatedBuildingElement();
-								if (relatedBuildingElement2 instanceof IfcWindow) {
-									IfcWindow ifcWindow = (IfcWindow)relatedBuildingElement2;
-									Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
-									if (IfcTools2D.containsAllPoints(space2D, window2D)) {
-										boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
-										if (windowExternal || wallExternal) {
-											double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight() * Math.pow(lengthUnitPrefix, 2);
-											GeometryInfo windowGeometry = relatedBuildingElement2.getGeometry();
-											if (windowGeometry != null) {
-												double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
-												if (semanticArea - geometricArea > 0.001) {
-													issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
-												} else {
-													totalWindowArea += semanticArea;
-													nrWindowsUsed++;
-												}
-											}
-										}
-									}
-								}
+			Set<IfcWindow> semanticallyLinkedWalls = getSemanticallyLinkedWindows(ifcSpace);
+			Set<IfcWindow> geometricallyLinkedWalls = getGeometricallyLinkedWindows(model, ifcSpace, lengthUnitPrefix);
+			
+			Set<IfcWindow> combined = new HashSet<>();
+			combined.addAll(semanticallyLinkedWalls);
+			combined.addAll(geometricallyLinkedWalls);
+			
+			for (IfcWindow ifcWindow : combined) {
+				Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
+				if (IfcTools2D.containsAllPoints(space2D, window2D)) {
+					boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
+					if (windowExternal) {
+						double semanticArea = ifcWindow.getOverallWidth() * ifcWindow.getOverallHeight() * Math.pow(lengthUnitPrefix, 2);
+						GeometryInfo windowGeometry = ifcWindow.getGeometry();
+						if (windowGeometry != null) {
+							double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
+							if (semanticArea - geometricArea > 0.001) {
+								issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
+							} else {
+								totalWindowArea += semanticArea;
+								nrWindowsUsed++;
 							}
 						}
 					}
 				}
 			}
+			
 			if (nrWindowsUsed == 0) {
 				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
 			} else {
 				if (ifcSpace.getGeometry() != null) {
-					if (totalWindowArea * conf.getRatio() > ifcSpace.getGeometry().getArea()) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea())).buildingStorey(ifcBuildingStorey).add();
+					double spaceArea = ifcSpace.getGeometry().getArea();
+					if (totalWindowArea * conf.getRatio() > spaceArea) {
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") provide enough area (" + totalWindowArea + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					} else {
-						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Window/space area ratio for space \"" + ifcSpace.getName() + "\"").is(String.format("%.2f", (totalWindowArea * conf.getRatio()))).shouldBe(" > " + String.format("%.2f", ifcSpace.getGeometry().getArea())).buildingStorey(ifcBuildingStorey).add();
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the " + nrWindowsUsed + " windows do not provide enough area (" + totalWindowArea + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					}
 				}
 			}
@@ -128,6 +124,58 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 		if (spaces.isEmpty()) {
 			issueContainer.builder().type(Type.CANNOT_CHECK).message("No IfcSpace objects found in model").add();
 		}
+	}
+	
+	private Set<IfcWindow> getSemanticallyLinkedWindows(IfcSpace ifcSpace) {
+		Set<IfcWindow> result = new HashSet<>();
+		for (IfcRelSpaceBoundary ifcRelSpaceBoundary : ifcSpace.getBoundedBy()) {
+			IfcElement relatedBuildingElement = ifcRelSpaceBoundary.getRelatedBuildingElement();
+			if (relatedBuildingElement instanceof IfcWall) {
+				boolean wallExternal = IfcUtils.getBooleanProperty(relatedBuildingElement, "IsExternal") == Tristate.TRUE;
+				if (wallExternal) {
+					for (IfcRelVoidsElement ifcRelVoidsElement : relatedBuildingElement.getHasOpenings()) {
+						IfcFeatureElementSubtraction relatedOpeningElement = ifcRelVoidsElement.getRelatedOpeningElement();
+						if (relatedOpeningElement instanceof IfcOpeningElement) {
+							IfcOpeningElement ifcOpeningElement = (IfcOpeningElement)relatedOpeningElement;
+							for (IfcRelFillsElement ifcRelFillsElement : ifcOpeningElement.getHasFillings()) {
+								IfcElement relatedBuildingElement2 = ifcRelFillsElement.getRelatedBuildingElement();
+								if (relatedBuildingElement2 instanceof IfcWindow) {
+									result.add((IfcWindow) relatedBuildingElement2);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	public Set<IfcWindow> getGeometricallyLinkedWindows(IfcModelInterface ifcModel, IfcSpace ifcSpace, float lengthUnitPrefix) {
+		// TODO The windows returned here are not necessarily linked to _external_ walls, because no semantic checking is done on walls
+		
+		Set<IfcWindow> result = new HashSet<>();
+		Area space2D = IfcTools2D.get2D(ifcSpace, lengthUnitPrefix);
+		
+		// Commented out and written below because we don't want to upgrade BIMserver at this point
+		//IfcTools2D.enlargeSlightlyInPlace(space2D, 1.1f);
+		
+		AffineTransform aLittleLarger = new AffineTransform();
+		double centerX = space2D.getBounds2D().getCenterX();
+		double centerY = space2D.getBounds2D().getCenterY();
+		aLittleLarger.translate(centerX, centerY);
+		aLittleLarger.scale(1.1f, 1.1f);
+		aLittleLarger.translate(-centerX, -centerY);
+		
+		space2D.transform(aLittleLarger);
+		
+		for (IfcWindow ifcWindow : ifcModel.getAllWithSubTypes(IfcWindow.class)) {
+			Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
+			if (IfcTools2D.containsAllPoints(space2D, window2D)) {
+				result.add(ifcWindow);
+			}
+		}
+		return result;
 	}
 	
 	private double getBiggestSingleFaceOfUntranslatedBoundingBox(GeometryInfo geometryInfo) {
