@@ -114,9 +114,9 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				if (ifcSpace.getGeometry() != null) {
 					double spaceArea = ifcSpace.getGeometry().getArea();
 					if (totalWindowArea * conf.getRatio() > spaceArea) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") provide enough area (" + totalWindowArea + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
+						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					} else {
-						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the " + nrWindowsUsed + " windows do not provide enough area (" + totalWindowArea + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
+						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") do not provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					}
 				}
 			}
