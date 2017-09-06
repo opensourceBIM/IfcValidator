@@ -22,14 +22,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import org.bimserver.bimbots.BimBotsException;
+import org.bimserver.bimbots.BimBotsInput;
+import org.bimserver.bimbots.BimBotsOutput;
+import org.bimserver.bimbots.BimBotsServiceInterface;
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.ifcvalidator.checks.ModelCheckerRegistry;
 import org.bimserver.interfaces.objects.SObjectType;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.models.store.BooleanType;
 import org.bimserver.models.store.ObjectDefinition;
+import org.bimserver.models.store.ObjectType;
 import org.bimserver.models.store.ParameterDefinition;
 import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
@@ -37,13 +41,15 @@ import org.bimserver.models.store.StoreFactory;
 import org.bimserver.models.store.StringType;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
+import org.bimserver.plugins.SchemaName;
 import org.bimserver.plugins.services.AbstractAddExtendedDataService;
 import org.bimserver.plugins.services.BimServerClientInterface;
 import org.bimserver.shared.exceptions.PluginException;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
+import org.bimserver.validationreport.IssueException;
 
-public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService {
+public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService implements BimBotsServiceInterface {
 
 	private final ModelCheckerRegistry modelCheckerRegistry;
 	private boolean generateExtendedDataPerCheck = false;
@@ -53,32 +59,73 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		this.generateExtendedDataPerCheck = generateExtendedDataPerCheck;
 		this.modelCheckerRegistry = modelCheckerRegistry;
 	}
-	
+
 	@Override
 	public void init(PluginContext pluginContext) throws PluginException {
 		super.init(pluginContext);
 	}
-	
+
 	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
+
+	public BimBotsOutput runBimBot(BimBotsInput input, ObjectType settings) throws BimBotsException {
+		try {
+			IfcModelInterface model = input.getIfcModel();
+
+			PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
+
+			String language = pluginConfiguration.getString("LANGUAGE");
+
+			String filename = language.toLowerCase() + ".properties";
+			Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
+			Properties properties = new Properties();
+			properties.load(Files.newInputStream(propertiesFile));
+
+			CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
+
+			IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
+			IssueContainer issueContainer = new IssueContainer();
+			for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
+				for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
+					String fullIdentifier = groupIdentifier + "___" + identifier;
+					if (pluginConfiguration.has(fullIdentifier)) {
+						if (pluginConfiguration.getBoolean(fullIdentifier)) {
+							ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
+							modelCheck.check(model, issueContainer, checkerContext);
+						}
+					}
+				}
+			}
+
+			BimBotsOutput bimBotsOutput = new BimBotsOutput(SchemaName.valueOf(getName()), issueContainerSerializer.getBytes(issueContainer));
+			bimBotsOutput.setContentType(getContentType());
+			bimBotsOutput.setContentDisposition(getFileName());
+			bimBotsOutput.setTitle("IFC Validator");
+			return bimBotsOutput;
+		} catch (IOException e) {
+			throw new BimBotsException(e);
+		} catch (IssueException e) {
+			throw new BimBotsException(e);
+		}
+	}
 
 	@Override
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
 		runningService.updateProgress(0);
-		
+
 		SProject project = bimServerClientInterface.getServiceInterface().getProjectByPoid(poid);
 		IfcModelInterface model = bimServerClientInterface.getModel(project, roid, true, false, true);
-		
+
 		PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
 
 		String language = pluginConfiguration.getString("LANGUAGE");
-		
+
 		String filename = language.toLowerCase() + ".properties";
 		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
 		Properties properties = new Properties();
 		properties.load(Files.newInputStream(propertiesFile));
-		
+
 		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
-		
+
 		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
 		IssueContainer issueContainer = new IssueContainer();
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
@@ -87,9 +134,10 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
-//						if (!generateExtendedDataPerCheck && !headerAdded) {
-//							issueContainerSerializer.addHeader(translator.translate(groupIdentifier + "_HEADER"));
-//						}
+						// if (!generateExtendedDataPerCheck && !headerAdded) {
+						// issueContainerSerializer.addHeader(translator.translate(groupIdentifier
+						// + "_HEADER"));
+						// }
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
 						modelCheck.check(model, issueContainer, checkerContext);
 					}
@@ -100,23 +148,24 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 				issueContainer = new IssueContainer();
 			}
 		}
-		
-//		issueContainerSerializer.validate();
-		
+
+		// issueContainerSerializer.validate();
+
 		if (!generateExtendedDataPerCheck) {
 			addExtendedData(issueContainerSerializer.getBytes(issueContainer), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
 		}
-		
+
 		runningService.updateProgress(100);
 	}
-	
+
 	public abstract String getContentType();
+
 	public abstract String getFileName();
-	
+
 	@Override
 	public ObjectDefinition getSettingsDefinition() {
-		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();	
-		
+		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
+
 		PrimitiveDefinition booleanType = StoreFactory.eINSTANCE.createPrimitiveDefinition();
 		booleanType.setType(PrimitiveEnum.BOOLEAN);
 
@@ -125,22 +174,22 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 		BooleanType trueValue = StoreFactory.eINSTANCE.createBooleanType();
 		trueValue.setValue(true);
-		
+
 		PrimitiveDefinition languageValue = StoreFactory.eINSTANCE.createPrimitiveDefinition();
 		languageValue.setType(PrimitiveEnum.STRING);
-		
+
 		StringType defaultLanguage = StoreFactory.eINSTANCE.createStringType();
 		defaultLanguage.setValue("EN");
-		
+
 		ParameterDefinition languageParameter = StoreFactory.eINSTANCE.createParameterDefinition();
 		languageParameter.setIdentifier("LANGUAGE");
 		languageParameter.setDescription("Language of the output");
 		languageParameter.setName("Language");
 		languageParameter.setType(languageValue);
 		languageParameter.setDefaultValue(defaultLanguage);
-		
+
 		objectDefinition.getParameters().add(languageParameter);
-		
+
 		String filename = "en.properties";
 		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
 		Properties properties = new Properties();
@@ -150,7 +199,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 			e.printStackTrace();
 		}
 		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
-		
+
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
@@ -165,7 +214,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 				objectDefinition.getParameters().add(parameter);
 			}
 		}
-		
+
 		return objectDefinition;
 	}
 }

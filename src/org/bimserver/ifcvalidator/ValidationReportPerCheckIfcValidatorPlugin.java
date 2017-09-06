@@ -1,6 +1,5 @@
 package org.bimserver.ifcvalidator;
 
-import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.ifcvalidator.checks.LimitedModelCheckerRegistry;
 
 /******************************************************************************

@@ -1,6 +1,13 @@
 package org.bimserver.ifcvalidator;
 
+import org.bimserver.bimbots.BimBotsException;
+import org.bimserver.bimbots.BimBotsInput;
+import org.bimserver.bimbots.BimBotsNonImplementedInputException;
+import org.bimserver.bimbots.BimBotsOutput;
+import org.bimserver.bimbots.BimBotsServiceInterface;
+import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
+import org.bimserver.plugins.SchemaName;
 
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
@@ -22,7 +29,7 @@ import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
 import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.JsonValidationReport;
 
-public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
+public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlugin implements BimBotsServiceInterface {
 
 	public ValidationReportIfcValidatorPlugin() {
 		super("VALIDATION_JSON_1_0", false, new FullModelCheckerRegistry());
