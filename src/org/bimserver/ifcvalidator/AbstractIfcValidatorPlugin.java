@@ -33,7 +33,6 @@ import org.bimserver.interfaces.objects.SObjectType;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.models.store.BooleanType;
 import org.bimserver.models.store.ObjectDefinition;
-import org.bimserver.models.store.ObjectType;
 import org.bimserver.models.store.ParameterDefinition;
 import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
@@ -67,7 +66,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
 
-	public BimBotsOutput runBimBot(BimBotsInput input, ObjectType settings) throws BimBotsException {
+	public BimBotsOutput runBimBot(BimBotsInput input, SObjectType settings) throws BimBotsException {
 		try {
 			IfcModelInterface model = input.getIfcModel();
 
