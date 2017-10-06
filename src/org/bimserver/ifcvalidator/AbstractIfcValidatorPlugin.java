@@ -20,7 +20,9 @@ package org.bimserver.ifcvalidator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 
 import org.bimserver.bimbots.BimBotsException;
 import org.bimserver.bimbots.BimBotsInput;
@@ -52,9 +54,11 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	private final ModelCheckerRegistry modelCheckerRegistry;
 	private boolean generateExtendedDataPerCheck = false;
+	private SchemaName outputSchema;
 
-	public AbstractIfcValidatorPlugin(String namespace, boolean generateExtendedDataPerCheck, ModelCheckerRegistry modelCheckerRegistry) {
-		super(namespace);
+	public AbstractIfcValidatorPlugin(SchemaName outputSchema, boolean generateExtendedDataPerCheck, ModelCheckerRegistry modelCheckerRegistry) {
+		super(outputSchema.name());
+		this.outputSchema = outputSchema;
 		this.generateExtendedDataPerCheck = generateExtendedDataPerCheck;
 		this.modelCheckerRegistry = modelCheckerRegistry;
 	}
@@ -128,7 +132,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
 		IssueContainer issueContainer = new IssueContainer();
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
-			boolean headerAdded = false;
+//			boolean headerAdded = false;
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				if (pluginConfiguration.has(fullIdentifier)) {
@@ -215,5 +219,15 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		}
 
 		return objectDefinition;
+	}
+	
+	@Override
+	public Set<SchemaName> getAvailableOutputs() {
+		return Collections.singleton(outputSchema);
+	}
+	
+	@Override
+	public Set<SchemaName> getAvailableInputs() {
+		return Collections.singleton(SchemaName.IFC_STEP_2X3TC1);
 	}
 }

@@ -23,15 +23,11 @@ import java.util.Locale;
 
 import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
-import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.IssueContainerSerializer;
-import org.bimserver.validationreport.IssueValidationException;
-import org.bimserver.validationreport.Type;
 
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import jxl.format.CellFormat;
 import jxl.format.Colour;
 import jxl.write.Label;
 import jxl.write.WritableCellFormat;

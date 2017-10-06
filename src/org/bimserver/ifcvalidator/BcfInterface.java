@@ -1,48 +1,12 @@
 package org.bimserver.ifcvalidator;
 
-/******************************************************************************
- * Copyright (C) 2009-2017  BIMserver.org
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
- *****************************************************************************/
-
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
-import org.bimserver.validationreport.IssueException;
-import org.bimserver.validationreport.IssueValidationException;
-import org.bimserver.validationreport.Type;
 import org.opensourcebim.bcf.BcfException;
 import org.opensourcebim.bcf.BcfFile;
-import org.opensourcebim.bcf.BcfValidationException;
-import org.opensourcebim.bcf.TopicFolder;
-import org.opensourcebim.bcf.markup.Header;
-import org.opensourcebim.bcf.markup.Header.File;
-import org.opensourcebim.bcf.markup.Markup;
-import org.opensourcebim.bcf.markup.Topic;
-import org.opensourcebim.bcf.markup.ViewPoint;
 
 public class BcfInterface implements IssueContainerSerializer {
 

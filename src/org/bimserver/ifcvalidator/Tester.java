@@ -18,8 +18,8 @@ package org.bimserver.ifcvalidator;
  *****************************************************************************/
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
+import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
 

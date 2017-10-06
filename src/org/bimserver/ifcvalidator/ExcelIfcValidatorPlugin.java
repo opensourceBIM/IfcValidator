@@ -1,6 +1,7 @@
 package org.bimserver.ifcvalidator;
 
 import org.bimserver.ifcvalidator.checks.FullModelCheckerRegistry;
+import org.bimserver.plugins.SchemaName;
 
 /******************************************************************************
  * Copyright (C) 2009-2017  BIMserver.org
@@ -24,7 +25,7 @@ import org.bimserver.validationreport.IssueContainerSerializer;
 public class ExcelIfcValidatorPlugin extends AbstractIfcValidatorPlugin {
 
 	public ExcelIfcValidatorPlugin() {
-		super("VALIDATION_XLSX_1_0", false, new FullModelCheckerRegistry());
+		super(SchemaName.VALIDATION_XLSX_1_0, false, new FullModelCheckerRegistry());
 	}
 
 	@Override
