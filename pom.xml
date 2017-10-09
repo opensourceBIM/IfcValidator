@@ -165,12 +165,12 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.86-SNAPSHOT</version>
+			<version>1.5.86</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>bcf</artifactId>
-			<version>0.0.12</version>
+			<version>0.0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
@@ -181,7 +181,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
-			<version>1.5.86-SNAPSHOT</version>
+			<version>1.5.86</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
