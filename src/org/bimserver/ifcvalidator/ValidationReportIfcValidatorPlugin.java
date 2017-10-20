@@ -27,7 +27,7 @@ import org.bimserver.validationreport.JsonValidationReport;
 public class ValidationReportIfcValidatorPlugin extends AbstractIfcValidatorPlugin implements BimBotsServiceInterface {
 
 	public ValidationReportIfcValidatorPlugin() {
-		super(SchemaName.VALIDATION_JSON_1_0, false, new FullModelCheckerRegistry());
+		super(SchemaName.VALIDATION_JSON_2_0, false, new FullModelCheckerRegistry());
 	}
 
 	@Override

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.bimserver.emf.IfcModelInterface;
@@ -78,10 +77,10 @@ public class UnidentifiedSpaces extends ModelCheck {
 		return ifcBuildingElementWrapper;
 	}
 	
-	private Area getOrCreateArea(IfcProduct ifcProduct, float multiplierMillimeters) {
+	private Area getOrCreateArea(IfcProduct ifcProduct, IfcTools2D ifcTools2D, float multiplierMillimeters) {
 		Area area = generatedAreas.get(ifcProduct);
 		if (area == null) {
-			area = IfcTools2D.get2D(ifcProduct, multiplierMillimeters);
+			area = ifcTools2D.get2D(ifcProduct, multiplierMillimeters);
 			generatedAreas.put(ifcProduct, area);
 		}
 		if (area != null) {
@@ -96,6 +95,8 @@ public class UnidentifiedSpaces extends ModelCheck {
 		boolean removeAllWalls = true;
 		lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
 
+		IfcTools2D ifcTools2D = new IfcTools2D();
+		
 		System.out.println(model.getAll(IfcRelConnectsPathElements.class).size() + " IfcRelConnectsPathElements found");
 
 		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
@@ -112,7 +113,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			Area totalArea = new Area();
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						totalArea.add(area);
 					}
@@ -127,7 +128,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 					IfcBuildingElement ifcBuildingElement = (IfcBuildingElement)ifcProduct;
 					graph.addVertex(getOrCreateWrapper(mapping, ifcBuildingElement));
-					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						totalArea.add(area);
 					}
@@ -189,7 +190,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 					public void run() {
 						Area cycleArea = new Area();
 						for (IfcBuildingElementWrapper ifcWallOutside : list) {
-							Area areaOutside = getOrCreateArea(ifcWallOutside.get(), lengthUnitPrefix);
+							Area areaOutside = getOrCreateArea(ifcWallOutside.get(), ifcTools2D, lengthUnitPrefix);
 							if (areaOutside != null) {
 								cycleArea.add(areaOutside);
 							}
@@ -207,7 +208,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 							boolean foundCompleteFitting = false;
 							for (Set<IfcBuildingElementWrapper> insideList : findSimpleCycles) {
 								for (IfcBuildingElementWrapper ifcWallInside : insideList) {
-									Area areaInside = getOrCreateArea(ifcWallInside.get(), lengthUnitPrefix);
+									Area areaInside = getOrCreateArea(ifcWallInside.get(), ifcTools2D, lengthUnitPrefix);
 									if (areaInside != null) {
 										if (IfcTools2D.containsAllPoints(smallest, areaInside)) {
 											foundCompleteFitting = true;
@@ -239,7 +240,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 //				}
 				Area cycleArea = new Area();
 				for (IfcBuildingElementWrapper ifcWall : list) {
-					Area area = getOrCreateArea(ifcWall.get(), lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcWall.get(), ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						cycleArea.add(area);
 					}
@@ -320,7 +321,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						checkArea.subtract(area);
 					}
@@ -329,7 +330,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			if (removeAllWalls) {
 				for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 					if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
-						Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+						Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 						if (area != null) {
 							checkArea.subtract(area);
 						}
@@ -349,7 +350,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			graphics.setColor(Color.decode("#919DFF"));
 			for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcSpace) {
-					Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						area.transform(affineTransform);
 						graphics.fill(area);
@@ -360,7 +361,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 			for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 				if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 					IfcElement ifcWall = ((IfcElement)ifcProduct);
-					Area area = getOrCreateArea(ifcWall, lengthUnitPrefix);
+					Area area = getOrCreateArea(ifcWall, ifcTools2D, lengthUnitPrefix);
 					if (area != null) {
 						area.transform(affineTransform);
 						graphics.fill(area);
@@ -378,7 +379,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 					newPath.closePath();
 					float area = Math.abs(IfcTools2D.getArea(new Area(newPath)));
 					if (area > 0.001) {
-						BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, newPath);
+						BufferedImage errorImage = renderImage(ifcBuildingStorey, ifcTools2D, totalArea, newPath);
 						issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 						nrErrors++;
 					}
@@ -394,13 +395,15 @@ public class UnidentifiedSpaces extends ModelCheck {
 			}
 
 			if (nrErrors == 0) {
-				BufferedImage errorImage = renderImage(ifcBuildingStorey, totalArea, null);
+				BufferedImage errorImage = renderImage(ifcBuildingStorey, ifcTools2D, totalArea, null);
 				issueContainer.builder().type(Type.SUCCESS).object(ifcBuildingStorey).buildingStorey(ifcBuildingStorey).message("No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 			}
 			
 			graphics.setColor(Color.RED);
 			checkArea.transform(affineTransform);
 			graphics.fill(checkArea);
+			
+			ifcTools2D.dumpStatistics();
 			
 			if (debug) {
 				Display display = new Display(ifcBuildingStorey.getName(), 2000, 2000);
@@ -409,7 +412,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 		}
 	}
 	
-	private void writeToJson(IfcBuildingStorey ifcBuildingStorey, Pseudograph<IfcBuildingElementWrapper, IfcRelConnectsPathElements> graph) {
+	public void writeToJson(IfcBuildingStorey ifcBuildingStorey, Pseudograph<IfcBuildingElementWrapper, IfcRelConnectsPathElements> graph) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		ObjectNode graphJson = objectMapper.createObjectNode();
 
@@ -441,7 +444,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 		}
 	}
 
-	private BufferedImage renderImage(IfcBuildingStorey ifcBuildingStorey, Area totalArea, Path2D.Float newPath) {
+	private BufferedImage renderImage(IfcBuildingStorey ifcBuildingStorey, IfcTools2D ifcTools2D, Area totalArea, Path2D.Float newPath) {
 		BufferedImage bufferedImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
 		
@@ -467,7 +470,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 		graphics.setColor(Color.decode("#919DFF"));
 		for (IfcProduct ifcProduct : IfcUtils.getDecomposition(ifcBuildingStorey)) {
 			if (ifcProduct instanceof IfcSpace) {
-				Area area = getOrCreateArea(ifcProduct, lengthUnitPrefix);
+				Area area = getOrCreateArea(ifcProduct, ifcTools2D, lengthUnitPrefix);
 				if (area != null) {
 					area.transform(affineTransform);
 					graphics.fill(area);
@@ -478,7 +481,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 		for (IfcProduct ifcProduct : IfcUtils.getContains(ifcBuildingStorey)) {
 			if (ifcProduct instanceof IfcWall || ifcProduct instanceof IfcCurtainWall) {
 				IfcElement ifcWall = ((IfcElement)ifcProduct);
-				Area area = getOrCreateArea(ifcWall, lengthUnitPrefix);
+				Area area = getOrCreateArea(ifcWall, ifcTools2D, lengthUnitPrefix);
 				if (area != null) {
 					area.transform(affineTransform);
 					graphics.fill(area);
@@ -531,7 +534,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 		return null;
 	}
 	
-	private Area getOuterCurve(Area area) {
+	public Area getOuterCurve(Area area) {
 		PathIterator pathIterator = area.getPathIterator(null);
 		if (area.isSingular()) {
 			System.out.println("Is singular");

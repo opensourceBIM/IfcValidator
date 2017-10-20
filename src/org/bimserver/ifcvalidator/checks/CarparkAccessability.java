@@ -122,6 +122,7 @@ public class CarparkAccessability extends ModelCheck {
 	
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
+		IfcTools2D ifcTools2D = new IfcTools2D();
 		scaleToMm = IfcUtils.getLengthUnitPrefix(model);
 		int regularSpaces = 0;
 		int handicappedSpaces = 0;
@@ -132,7 +133,7 @@ public class CarparkAccessability extends ModelCheck {
 			if ((ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking"))) {
 				totalCarparks++;
 				CarparkVote psetVote = checkPset(ifcSpace);
-				CarparkVote geometryVote = checkGeometry(ifcSpace);
+				CarparkVote geometryVote = checkGeometry(ifcTools2D, ifcSpace);
 				if (psetVote.equals(geometryVote)) {
 					if (psetVote.carparkVoteType == CarparkVoteType.REGULAR_CARPARK) {
 						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Both pset and geometry agree that this is a regular carpark").add();
@@ -185,12 +186,13 @@ public class CarparkAccessability extends ModelCheck {
 			issueContainer.builder().type(Type.CANNOT_CHECK).message("No carparks found, not checking").is(0).shouldBe("not 0").add();
 //			issueContainer.add(Type.CANNOT_CHECK, "No carparks found, not checking", "0", "> 0");
 		}
+		ifcTools2D.dumpStatistics();
 	}
 	
-	private CarparkVote checkGeometry(IfcSpace ifcSpace) {
+	private CarparkVote checkGeometry(IfcTools2D ifcTools2D, IfcSpace ifcSpace) {
 		CarparkVote carparkVote = new CarparkVote(CheckType.GEOMETRY);
 
-		Area area = IfcTools2D.get2D(ifcSpace, scaleToMm);
+		Area area = ifcTools2D.get2D(ifcSpace, scaleToMm);
 		Rectangle2D bounds2d = area.getBounds2D();
 		
 		float xDim = (float) bounds2d.getWidth();

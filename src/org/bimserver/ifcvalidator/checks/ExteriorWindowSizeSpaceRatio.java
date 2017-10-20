@@ -55,6 +55,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
+		IfcTools2D ifcTools2D = new IfcTools2D();
 		List<IfcSpace> spaces = model.getAll(IfcSpace.class);
 		for (IfcSpace ifcSpace : model.getAll(IfcSpace.class)) {
 			if (ifcSpace.getObjectType() != null && ifcSpace.getObjectType().equalsIgnoreCase("parking")) {
@@ -66,8 +67,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			
 			float lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model);
 			
-			Area space2D = IfcTools2D.get2D(ifcSpace, lengthUnitPrefix);
-			
+			Area space2D = ifcTools2D.get2D(ifcSpace, lengthUnitPrefix);
 			
 			// Commented out and written below because we don't want to upgrade BIMserver at this point
 			//IfcTools2D.enlargeSlightlyInPlace(space2D, 1.1f);
@@ -82,14 +82,14 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			space2D.transform(aLittleLarger);
 			
 			Set<IfcWindow> semanticallyLinkedWalls = getSemanticallyLinkedWindows(ifcSpace);
-			Set<IfcWindow> geometricallyLinkedWalls = getGeometricallyLinkedWindows(model, ifcSpace, lengthUnitPrefix);
+			Set<IfcWindow> geometricallyLinkedWalls = getGeometricallyLinkedWindows(ifcTools2D, model, ifcSpace, lengthUnitPrefix);
 			
 			Set<IfcWindow> combined = new HashSet<>();
 			combined.addAll(semanticallyLinkedWalls);
 			combined.addAll(geometricallyLinkedWalls);
 			
 			for (IfcWindow ifcWindow : combined) {
-				Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
+				Area window2D = ifcTools2D.get2D(ifcWindow, lengthUnitPrefix);
 				if (IfcTools2D.containsAllPoints(space2D, window2D)) {
 					boolean windowExternal = IfcUtils.getBooleanProperty(ifcWindow, "IsExternal") == Tristate.TRUE;
 					if (windowExternal) {
@@ -121,6 +121,8 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 				}
 			}
 		}
+		ifcTools2D.dumpStatistics();
+		
 		if (spaces.isEmpty()) {
 			issueContainer.builder().type(Type.CANNOT_CHECK).message("No IfcSpace objects found in model").add();
 		}
@@ -151,11 +153,11 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 		return result;
 	}
 	
-	public Set<IfcWindow> getGeometricallyLinkedWindows(IfcModelInterface ifcModel, IfcSpace ifcSpace, float lengthUnitPrefix) {
+	public Set<IfcWindow> getGeometricallyLinkedWindows(IfcTools2D ifcTools2D, IfcModelInterface ifcModel, IfcSpace ifcSpace, float lengthUnitPrefix) {
 		// TODO The windows returned here are not necessarily linked to _external_ walls, because no semantic checking is done on walls
 		
 		Set<IfcWindow> result = new HashSet<>();
-		Area space2D = IfcTools2D.get2D(ifcSpace, lengthUnitPrefix);
+		Area space2D = ifcTools2D.get2D(ifcSpace, lengthUnitPrefix);
 		
 		// Commented out and written below because we don't want to upgrade BIMserver at this point
 		//IfcTools2D.enlargeSlightlyInPlace(space2D, 1.1f);
@@ -170,7 +172,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 		space2D.transform(aLittleLarger);
 		
 		for (IfcWindow ifcWindow : ifcModel.getAllWithSubTypes(IfcWindow.class)) {
-			Area window2D = IfcTools2D.get2D(ifcWindow, lengthUnitPrefix);
+			Area window2D = ifcTools2D.get2D(ifcWindow, lengthUnitPrefix);
 			if (IfcTools2D.containsAllPoints(space2D, window2D)) {
 				result.add(ifcWindow);
 			}

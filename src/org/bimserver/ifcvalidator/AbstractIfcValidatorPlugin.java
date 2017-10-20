@@ -90,12 +90,14 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 			for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 				for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 					String fullIdentifier = groupIdentifier + "___" + identifier;
+					IssueContainer issueContainerGroup = new IssueContainer();
 					if (pluginConfiguration.has(fullIdentifier)) {
 						if (pluginConfiguration.getBoolean(fullIdentifier)) {
 							ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-							modelCheck.check(model, issueContainer, checkerContext);
+							modelCheck.check(model, issueContainerGroup, checkerContext);
 						}
 					}
+					issueContainer.add(issueContainerGroup);
 				}
 			}
 
