@@ -224,12 +224,12 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	}
 	
 	@Override
-	public Set<SchemaName> getAvailableOutputs() {
-		return Collections.singleton(outputSchema);
+	public Set<String> getAvailableOutputs() {
+		return Collections.singleton(outputSchema.name());
 	}
 	
 	@Override
-	public Set<SchemaName> getAvailableInputs() {
-		return Collections.singleton(SchemaName.IFC_STEP_2X3TC1);
+	public Set<String> getAvailableInputs() {
+		return Collections.singleton(SchemaName.IFC_STEP_2X3TC1.name());
 	}
 }
