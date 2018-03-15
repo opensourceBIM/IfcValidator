@@ -165,7 +165,11 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
+<<<<<<< HEAD
 			<version>1.5.97-SNAPSHOT</version>
+=======
+			<version>1.5.94-SNAPSHOT</version>
+>>>>>>> branch 'master' of https://github.com/opensourceBIM/IfcValidator.git
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
@@ -181,7 +185,11 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
+<<<<<<< HEAD
 			<version>1.5.97-SNAPSHOT</version>
+=======
+			<version>1.5.94-SNAPSHOT</version>
+>>>>>>> branch 'master' of https://github.com/opensourceBIM/IfcValidator.git
 			<scope>test</scope>
 		</dependency>
 		<dependency>
