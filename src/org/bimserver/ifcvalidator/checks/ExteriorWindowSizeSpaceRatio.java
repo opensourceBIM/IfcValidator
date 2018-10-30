@@ -198,8 +198,8 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 	}
 	
 	private double getBiggestSingleFaceOfUntranslatedBoundingBox(GeometryInfo geometryInfo) {
-		Vector3f max = geometryInfo.getMaxBoundsUntranslated();
-		Vector3f min = geometryInfo.getMinBoundsUntranslated();
+		Vector3f max = geometryInfo.getBoundsUntransformed().getMax();
+		Vector3f min = geometryInfo.getBoundsUntransformed().getMin();
 		
 		double width = max.getX() - min.getX();
 		double height = max.getY() - min.getY();

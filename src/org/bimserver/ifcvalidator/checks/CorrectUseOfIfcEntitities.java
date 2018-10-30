@@ -35,7 +35,7 @@ public class CorrectUseOfIfcEntitities extends ModelCheck {
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) {
 		for (IfcSlab ifcSlab : model.getAll(IfcSlab.class)) {
-			ifcSlab.getGeometry().getMaxBounds();
+			ifcSlab.getGeometry().getBounds().getMax();
 		}
 	}
 

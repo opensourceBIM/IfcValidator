@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
+import org.bimserver.bimbots.BimBotContext;
 import org.bimserver.bimbots.BimBotsException;
 import org.bimserver.bimbots.BimBotsInput;
 import org.bimserver.bimbots.BimBotsOutput;
@@ -70,7 +71,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
 
-	public BimBotsOutput runBimBot(BimBotsInput input, SObjectType settings) throws BimBotsException {
+	public BimBotsOutput runBimBot(BimBotsInput input, BimBotContext bimBotContext, SObjectType settings) throws BimBotsException {
 		try {
 			IfcModelInterface model = input.getIfcModel();
 
@@ -231,5 +232,10 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	@Override
 	public Set<String> getAvailableInputs() {
 		return Collections.singleton(SchemaName.IFC_STEP_2X3TC1.name());
+	}
+	
+	@Override
+	public boolean requiresGeometry() {
+		return false;
 	}
 }
