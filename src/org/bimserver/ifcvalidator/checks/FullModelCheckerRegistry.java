@@ -20,6 +20,7 @@ package org.bimserver.ifcvalidator.checks;
 public class FullModelCheckerRegistry extends ModelCheckerRegistry {
 	
 	public FullModelCheckerRegistry() {
+		addCheck(new FireratingDoorsSameAsWalls());
 		addCheck(new OnlyOneIfcProject());
 
 		addCheck(new AtLeastOneBuilding());
