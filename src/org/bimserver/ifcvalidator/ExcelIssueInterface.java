@@ -24,6 +24,7 @@ import java.util.Locale;
 import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
+import org.bimserver.validationreport.RootIssueContainer;
 
 import jxl.CellView;
 import jxl.Workbook;
@@ -122,7 +123,7 @@ public class ExcelIssueInterface implements IssueContainerSerializer {
 //	}
 
 	@Override
-	public byte[] getBytes(IssueContainer issueContainer) throws IOException {
+	public byte[] getBytes(RootIssueContainer issueContainer) throws IOException {
 		for (Issue issue : issueContainer.list()) {
 			
 		}

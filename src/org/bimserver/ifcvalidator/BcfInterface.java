@@ -1,7 +1,6 @@
 package org.bimserver.ifcvalidator;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 /******************************************************************************
  * Copyright (C) 2009-2018  BIMserver.org
@@ -31,10 +30,12 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.bimserver.emf.IdEObject;
 import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.RootIssueContainer;
 import org.bimserver.validationreport.Type;
 import org.opensourcebim.bcf.BcfException;
 import org.opensourcebim.bcf.BcfFile;
@@ -43,22 +44,39 @@ import org.opensourcebim.bcf.markup.Header;
 import org.opensourcebim.bcf.markup.Markup;
 import org.opensourcebim.bcf.markup.Topic;
 import org.opensourcebim.bcf.markup.ViewPoint;
+import org.slf4j.LoggerFactory;
 
 public class BcfInterface implements IssueContainerSerializer {
 
+	private static DatatypeFactory DATATYPE_FACTORY;
 	private BcfFile bcfFile;
+	private RootIssueContainer rootIssueContainer;
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BcfFile.class);
 
+	static {
+		try {
+			DATATYPE_FACTORY = DatatypeFactory.newInstance();
+		} catch (DatatypeConfigurationException e) {
+			LOGGER.error("", e);
+		}
+	}
+	
 	public BcfInterface(CheckerContext translator) {
 		bcfFile = new BcfFile();
 	}
 	
-	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe) throws IssueException {
+	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe, String author) throws IssueException {
+		if (messageType == Type.SUCCESS) {
+			// Not really uesful in a BCF, skip it
+			return null;
+		}
 		TopicFolder topicFolder = bcfFile.createTopicFolder();
 		Topic topic = topicFolder.createTopic();
 		topic.setTitle(message);
 		topic.setGuid(topicFolder.getUuid().toString());
+		topic.setTopicType(messageType.name());
 		topic.setTopicStatus(messageType.toString());
-		topic.setCreationAuthor("Test");
+		topic.setCreationAuthor(author);
 		topicFolder.setDefaultSnapShotToDummy();
 
 		Issue issue = new Issue(){
@@ -90,27 +108,25 @@ public class BcfInterface implements IssueContainerSerializer {
 		
 		Header.File file = new Header.File();
 		file.setIfcSpatialStructureElement(guid);
+		IdEObject ifcProject = rootIssueContainer.getValidationMetaData().getIfcProject();
+		if (ifcProject != null) {
+			file.setIfcProject((String) ifcProject.eGet(ifcProject.eClass().getEStructuralFeature("GlobalId")));
+		}
+		file.setIsExternal(true);
+		file.setFilename(rootIssueContainer.getValidationMetaData().getFileName());
+		file.setDate(rootIssueContainer.getValidationMetaData().getFileDate());
+		file.setReference(rootIssueContainer.getValidationMetaData().getRemoteReference());
 		files.add(file);
 		
 		GregorianCalendar now = new GregorianCalendar();
-		try {
-			topicFolder.getMarkup().getTopic().setCreationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(now));
-		} catch (DatatypeConfigurationException e) {
-			throw new IssueException(e);
-		}
+		topicFolder.getMarkup().getTopic().setCreationDate(DATATYPE_FACTORY.newXMLGregorianCalendar(now));
 		return issue;
 	}
 
 	@Override
-	public byte[] getBytes(IssueContainer issueContainer) throws IOException {
-		Collection<Issue> list = issueContainer.list();
-		for (Issue issue : list) {
-			try {
-				add(issue.getType(), null, null, null, issue.getMessage(), issue.getIs(), "" + issue.getShouldBe());
-			} catch (IssueException e) {
-				e.printStackTrace();
-			}
-		}
+	public byte[] getBytes(RootIssueContainer issueContainer) throws IOException {
+		this.rootIssueContainer = issueContainer;
+		processContainer(issueContainer);
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -119,5 +135,24 @@ public class BcfInterface implements IssueContainerSerializer {
 			throw new IOException(e);
 		}
 		return baos.toByteArray();
+	}
+
+	private void processContainer(IssueContainer issueContainer) {
+		Collection<Issue> list = issueContainer.list();
+		for (Issue issue : list) {
+			try {
+				if (issue instanceof IssueContainer) {
+					IssueContainer container = (IssueContainer)issue;
+					processContainer(container);
+				} else {
+					add(issue.getType(), null, null, null, issue.getMessage(), issue.getIs(), "" + issue.getShouldBe(), issue.getAuthor());
+				}
+			} catch (IssueException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.info(issue.toString());
+				e.printStackTrace();
+			}
+		}
 	}
 }

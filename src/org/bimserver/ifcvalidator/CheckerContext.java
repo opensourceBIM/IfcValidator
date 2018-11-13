@@ -31,11 +31,13 @@ public class CheckerContext {
 	private Properties properties;
 	private String filename;
 	private Path rootPath;
+	private String author;
 
-	public CheckerContext(String filename, Properties properties, Path rootPath) {
+	public CheckerContext(String filename, Properties properties, Path rootPath, String author) {
 		this.filename = filename;
 		this.properties = properties;
 		this.rootPath = rootPath;
+		this.author = author;
 	}
 	
 	public String translate(String key) {
@@ -50,5 +52,9 @@ public class CheckerContext {
 	public InputStream getResource(String name) throws IOException {
 		Path resolve = rootPath.resolve("input").resolve(name);
 		return Files.newInputStream(resolve);
+	}
+
+	public String getAuthor() {
+		return author;
 	}
 }
