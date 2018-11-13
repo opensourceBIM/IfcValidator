@@ -50,14 +50,14 @@ public class CheckVolumeUnit extends ModelCheck {
 						volumeUnitFound = true;
 						boolean metres = ifcSIUnit.getName() == IfcSIUnitName.CUBIC_METRE;
 						boolean rightPrefix = ifcSIUnit.getPrefix() == IfcSIPrefix.NULL;
-						issueContainer.builder().type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
-						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit").is(metres).shouldBe("Cubic metres").add();
-						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit").is(metres).shouldBe("Cubic metres").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Volume unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
 					}
 				}
 			}
 			if (!volumeUnitFound) {
-				issueContainer.builder().type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(volumeUnitFound ? Type.SUCCESS : Type.ERROR).message("Volume unit definition").is(volumeUnitFound).shouldBe("Found").add();
 			}
 		}
 	}

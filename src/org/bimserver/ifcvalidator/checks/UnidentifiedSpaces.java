@@ -380,7 +380,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 					float area = Math.abs(IfcTools2D.getArea(new Area(newPath)));
 					if (area > 0.001) {
 						BufferedImage errorImage = renderImage(ifcBuildingStorey, ifcTools2D, totalArea, newPath);
-						issueContainer.builder().type(Type.ERROR).object(ifcBuildingStorey).message("Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcBuildingStorey).message("Missing IfcSpace of " + String.format("%.2f", area) + " m2 on \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 						nrErrors++;
 					}
 					newPath = new Path2D.Float();
@@ -396,7 +396,7 @@ public class UnidentifiedSpaces extends ModelCheck {
 
 			if (nrErrors == 0) {
 				BufferedImage errorImage = renderImage(ifcBuildingStorey, ifcTools2D, totalArea, null);
-				issueContainer.builder().type(Type.SUCCESS).object(ifcBuildingStorey).buildingStorey(ifcBuildingStorey).message("No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcBuildingStorey).buildingStorey(ifcBuildingStorey).message("No unidentified spaces found in building storey \"" + ifcBuildingStorey.getName() + "\"").image(errorImage).add();
 			}
 			
 			graphics.setColor(Color.RED);

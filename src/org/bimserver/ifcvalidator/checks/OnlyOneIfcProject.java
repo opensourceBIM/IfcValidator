@@ -35,7 +35,7 @@ public class OnlyOneIfcProject extends ModelCheck {
 		List<IfcProject> projects = model.getAll(IfcProject.class);
 		
 		IfcProject ifcProject = projects.size() == 1 ? projects.get(0) : null;
-		issueContainer.builder().type(projects.size() == 1 ? Type.SUCCESS : Type.ERROR)
+		issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(projects.size() == 1 ? Type.SUCCESS : Type.ERROR)
 		.object(ifcProject).message(checkerContext.translate("NUMBER_OF_PROJECTS")).is(projects.size() + " " + checkerContext.translate(projects.size() == 1 ? "PROJECT" : "PROJECTS")).shouldBe(checkerContext.translate("EXACTLY_ONE_PROJECT")).add();
 	}
 }

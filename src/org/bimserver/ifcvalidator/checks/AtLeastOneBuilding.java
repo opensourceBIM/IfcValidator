@@ -38,7 +38,7 @@ public class AtLeastOneBuilding extends ModelCheck {
 		IfcBuilding building = buildings.size() == 1 ? buildings.get(0) : null;
 		
 		boolean valid = buildings.size() > 0;
-		issueContainer.builder().type(valid ? Type.SUCCESS : Type.ERROR).object(building).message(checkerContext.translate("NUMBER_OF_BUILDINGS")).add();
+		issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(valid ? Type.SUCCESS : Type.ERROR).object(building).message(checkerContext.translate("NUMBER_OF_BUILDINGS")).add();
 //		issueContainer.add(, building == null ? null : "IfcBuilding", building == null ? null : building.getGlobalId(), building == null ? null : building.getOid(), translator.translate("NUMBER_OF_BUILDINGS"), buildings.size() + " " + translator.translate(buildings.size() == 1 ? "BUILDING_OBJECT" : "BUILDING_OBJECTS"), translator.translate("ATLEAST_ONE_BUILDING"));
 	}
 }

@@ -41,9 +41,9 @@ public class IfcSiteLatitude extends ModelCheck {
 			
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefLatitude())) {
 				// TODO check whether this is a valid WSG84
-				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefLatitude").is(ifcSite.getRefLatitude()).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcSite).message("RefLatitude").is(ifcSite.getRefLatitude()).shouldBe("Not null").add();
 			} else {
-				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefLatitude").is(null).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcSite).message("RefLatitude").is(null).shouldBe("Not null").add();
 			}
 		}
 	}

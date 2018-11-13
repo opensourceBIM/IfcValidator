@@ -37,6 +37,6 @@ public class OnlyOneIfcSite extends ModelCheck {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		IfcSite ifcSite = sites.size() == 1 ? sites.get(0) : null;
 		
-		issueContainer.builder().type(sites.size() == 1 ? Type.SUCCESS : Type.ERROR).object(ifcSite).message(checkerContext.translate("NUMBER_OF_SITES")).is(sites.size() + " " + checkerContext.translate(sites.size() == 1 ? "SITE" : "SITES")).shouldBe(checkerContext.translate("EXACTLY_ONE_SITE")).add();
+		issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(sites.size() == 1 ? Type.SUCCESS : Type.ERROR).object(ifcSite).message(checkerContext.translate("NUMBER_OF_SITES")).is(sites.size() + " " + checkerContext.translate(sites.size() == 1 ? "SITE" : "SITES")).shouldBe(checkerContext.translate("EXACTLY_ONE_SITE")).add();
 	}
 }

@@ -115,7 +115,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 						if (windowGeometry != null) {
 							double geometricArea = getBiggestSingleFaceOfUntranslatedBoundingBox(windowGeometry);
 							if (semanticArea - geometricArea > 0.001) {
-								issueContainer.builder().type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
+								issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcWindow).message("Semantic window area (OverallWidth*OverallHeight) larger than geometric area").is(String.format("%.2f", (semanticArea))).shouldBe(String.format("%.2f", (geometricArea))).buildingStorey(ifcBuildingStorey).add();
 							} else {
 								totalWindowArea += semanticArea;
 								nrWindowsUsed++;
@@ -126,14 +126,14 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 			}
 			
 			if (nrWindowsUsed == 0) {
-				issueContainer.builder().type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.CANNOT_CHECK).object(ifcSpace).message("Cannot check window/space ratio because no consistent (exterior) windows found in space \"" + ifcSpace.getName() + "\"").buildingStorey(ifcBuildingStorey).add();
 			} else {
 				if (ifcSpace.getGeometry() != null) {
 					double spaceArea = ifcSpace.getGeometry().getArea();
 					if (totalWindowArea * conf.getRatio() > spaceArea) {
-						issueContainer.builder().type(Type.SUCCESS).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					} else {
-						issueContainer.builder().type(Type.ERROR).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") do not provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcSpace).message("Space area (" + spaceArea + "m2) requires " + (spaceArea / conf.getRatio()) + "m2 of ventilation area, the windows (" + nrWindowsUsed + ") do not provide enough area (" + String.format("%.2f", totalWindowArea) + "m2)").is(String.format("%.2f", (totalWindowArea))).shouldBe(" > " + String.format("%.2f", spaceArea / conf.getRatio())).buildingStorey(ifcBuildingStorey).add();
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public class ExteriorWindowSizeSpaceRatio extends ModelCheck {
 		ifcTools2D.dumpStatistics();
 		
 		if (spaces.isEmpty()) {
-			issueContainer.builder().type(Type.CANNOT_CHECK).message("No IfcSpace objects found in model").add();
+			issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.CANNOT_CHECK).message("No IfcSpace objects found in model").add();
 		}
 	}
 	

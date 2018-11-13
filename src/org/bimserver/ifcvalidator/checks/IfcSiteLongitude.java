@@ -41,9 +41,9 @@ public class IfcSiteLongitude extends ModelCheck {
 			
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefLongitude())) {
 				// TODO check whether this is a valid WSG84
-				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefLongitude").is(ifcSite.getRefLongitude()).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcSite).message("RefLongitude").is(ifcSite.getRefLongitude()).shouldBe("Not null").add();
 			} else {
-				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefLongitude").is(null).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcSite).message("RefLongitude").is(null).shouldBe("Not null").add();
 			}
 		}
 	}

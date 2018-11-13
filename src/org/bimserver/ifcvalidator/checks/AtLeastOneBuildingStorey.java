@@ -39,7 +39,7 @@ public class AtLeastOneBuildingStorey extends ModelCheck {
 		IfcBuildingStorey buildingStorey = size == 1 ? buildingStories.get(0) : null;
 		
 		boolean valid = size > 0;
-		issueContainer.builder().
+		issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).
 			type(valid ? Type.SUCCESS : Type.ERROR).
 			object(buildingStorey).
 			message(checkerContext.translate(size == 1 ? "BUILDING_STOREY_OBJECT" : "BUILDING_STOREY_OBJECTS")).

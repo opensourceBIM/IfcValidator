@@ -39,9 +39,9 @@ public class IfcSiteKadastaleAanduiding extends ModelCheck {
 		for (IfcSite ifcSite : sites) {
 			try {
 				checkKadastraleAanduidingen(ifcSite);
-				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("Kadastrale aanduiding").is("Valid").shouldBe("Valid").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcSite).message("Kadastrale aanduiding").is("Valid").shouldBe("Valid").add();
 			} catch (ValidationException e) {
-				issueContainer.builder().type(Type.ERROR).object(ifcSite).message(e.getMessage()).is(ifcSite.getName()).shouldBe("Valid").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcSite).message(e.getMessage()).is(ifcSite.getName()).shouldBe("Valid").add();
 			}
 		}
 	}

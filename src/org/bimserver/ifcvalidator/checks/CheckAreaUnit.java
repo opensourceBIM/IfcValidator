@@ -50,14 +50,14 @@ public class CheckAreaUnit extends ModelCheck {
 						areaUnitFound = true;
 						boolean metres = ifcSIUnit.getName() == IfcSIUnitName.SQUARE_METRE;
 						boolean rightPrefix = ifcSIUnit.getPrefix() == IfcSIPrefix.NULL;
-						issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
-						issueContainer.builder().type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit").is(metres).shouldBe("Metres squared").add();
-						issueContainer.builder().type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(areaUnitFound ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(metres ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit").is(metres).shouldBe("Metres squared").add();
+						issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(rightPrefix ? Type.SUCCESS : Type.ERROR).object(ifcSIUnit).message("Area unit prefix").is(ifcSIUnit.getPrefix()).shouldBe("None").add();
 					}
 				}
 			}
 			if (!areaUnitFound) {
-				issueContainer.builder().type(areaUnitFound ? Type.SUCCESS : Type.ERROR).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(areaUnitFound ? Type.SUCCESS : Type.ERROR).message("Area unit definition").is(areaUnitFound).shouldBe("Found").add();
 			}
 		}
 	}

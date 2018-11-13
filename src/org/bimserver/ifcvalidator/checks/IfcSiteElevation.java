@@ -38,9 +38,9 @@ public class IfcSiteElevation extends ModelCheck {
 		List<IfcSite> sites = model.getAll(IfcSite.class);
 		for (IfcSite ifcSite : sites) {
 			if (ifcSite.eIsSet(Ifc2x3tc1Package.eINSTANCE.getIfcSite_RefElevation())) {
-				issueContainer.builder().type(Type.SUCCESS).object(ifcSite).message("RefElevation").is(ifcSite.getRefElevation()).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.SUCCESS).object(ifcSite).message("RefElevation").is(ifcSite.getRefElevation()).shouldBe("Not null").add();
 			} else {
-				issueContainer.builder().type(Type.ERROR).object(ifcSite).message("RefElevation").is(null).shouldBe("Not null").add();
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).type(Type.ERROR).object(ifcSite).message("RefElevation").is(null).shouldBe("Not null").add();
 			}
 		}
 	}
