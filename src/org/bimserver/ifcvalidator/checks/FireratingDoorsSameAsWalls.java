@@ -29,33 +29,39 @@ public class FireratingDoorsSameAsWalls extends ModelCheck {
 		List<IfcWall> walls = model.getAllWithSubTypes(IfcWall.class);
 		for (IfcWall ifcWall : walls) {
 			String wallFireRating = IfcUtils.getStringProperty(ifcWall, "FireRating");
-			if (wallFireRating == null) {
-				issueContainer.builder().object(ifcWall).message("Wall has no fire rating").type(Type.CANNOT_CHECK).add();
-			} else {
-				EList<IfcRelVoidsElement> openings = ifcWall.getHasOpenings();
-				for (IfcRelVoidsElement ifcRelVoidsElement : openings) {
-					IfcFeatureElementSubtraction relatedOpeningElement = ifcRelVoidsElement.getRelatedOpeningElement();
-					if (relatedOpeningElement instanceof IfcOpeningElement) {
-						IfcOpeningElement ifcOpeningElement = (IfcOpeningElement)relatedOpeningElement;
-						EList<IfcRelFillsElement> hasFillings = ifcOpeningElement.getHasFillings();
-						for (IfcRelFillsElement ifcRelFillsElement : hasFillings) {
-							IfcElement relatedBuildingElement = ifcRelFillsElement.getRelatedBuildingElement();
-							if (relatedBuildingElement instanceof IfcDoor) {
-								check(issueContainer, ifcWall, (IfcDoor)relatedBuildingElement, wallFireRating);
-							}
-						}
+			EList<IfcRelVoidsElement> openings = ifcWall.getHasOpenings();
+			for (IfcRelVoidsElement ifcRelVoidsElement : openings) {
+				IfcFeatureElementSubtraction relatedOpeningElement = ifcRelVoidsElement.getRelatedOpeningElement();
+				if (relatedOpeningElement instanceof IfcOpeningElement) {
+					IfcOpeningElement ifcOpeningElement = (IfcOpeningElement)relatedOpeningElement;
+					EList<IfcRelFillsElement> hasFillings = ifcOpeningElement.getHasFillings();
+					for (IfcRelFillsElement ifcRelFillsElement : hasFillings) {
+						IfcElement relatedBuildingElement = ifcRelFillsElement.getRelatedBuildingElement();
+						check(issueContainer, ifcWall, relatedBuildingElement, wallFireRating, checkerContext);
 					}
 				}
 			}
 		}
 	}
 
-	private void check(IssueContainer issueContainer, IfcWall ifcWall, IfcDoor ifcDoor, String wallFireRating) {
-		String doorFireRating = IfcUtils.getStringProperty(ifcDoor, "FireRating");
-		if (doorFireRating == null) {
-			issueContainer.builder().object(ifcDoor).message("Door has no fire rating").type(Type.CANNOT_CHECK).shouldBe(wallFireRating).add();
+	private void check(IssueContainer issueContainer, IfcWall ifcWall, IfcElement ifcElement, String wallFireRating, CheckerContext checkerContext) {
+		String elementFireRating = IfcUtils.getStringProperty(ifcElement, "FireRating");
+		if (elementFireRating == null) {
+			if (wallFireRating == null) {
+				// No need to report anything
+			} else {
+				issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).object(ifcElement).message(ifcElement.eClass().getName() + " has no fire rating").type(Type.CANNOT_CHECK).shouldBe(wallFireRating).add();
+			}
 		} else {
-			issueContainer.builder().object(ifcDoor).message("Fire rating not the same as containing wall").type(Type.ERROR).is(doorFireRating).shouldBe(wallFireRating).add();
+			if (wallFireRating == null) {
+				// So the wall has no firerating, but the door/window has one, what to do?
+			} else {
+				if (wallFireRating.equalsIgnoreCase(elementFireRating)) {
+					// OK
+				} else {
+					issueContainer.builder().originatingCheck(this.getClass().getSimpleName()).author(checkerContext.getAuthor()).object(ifcElement).message("Fire rating not the same as containing wall").type(Type.ERROR).is(elementFireRating).shouldBe(wallFireRating).add();
+				}
+			}
 		}
 	}
 }
