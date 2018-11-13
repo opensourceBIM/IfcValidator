@@ -18,23 +18,35 @@ package org.bimserver.ifcvalidator;
  *****************************************************************************/
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.bimserver.bimbots.BimBotContext;
 import org.bimserver.bimbots.BimBotsException;
 import org.bimserver.bimbots.BimBotsInput;
 import org.bimserver.bimbots.BimBotsOutput;
 import org.bimserver.bimbots.BimBotsServiceInterface;
+import org.bimserver.database.queries.om.Query;
+import org.bimserver.emf.IdEObject;
 import org.bimserver.emf.IfcModelInterface;
+import org.bimserver.emf.PackageMetaData;
 import org.bimserver.ifcvalidator.checks.ModelCheck;
 import org.bimserver.ifcvalidator.checks.ModelCheckerRegistry;
 import org.bimserver.interfaces.objects.SObjectType;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.models.store.BooleanType;
+import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.models.store.ParameterDefinition;
 import org.bimserver.models.store.PrimitiveDefinition;
@@ -50,9 +62,14 @@ import org.bimserver.shared.exceptions.PluginException;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.IssueException;
+import org.bimserver.validationreport.RootIssueContainer;
+import org.bimserver.validationreport.ValidationMetaData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedDataService implements BimBotsServiceInterface {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIfcValidatorPlugin.class);
 	private final ModelCheckerRegistry modelCheckerRegistry;
 	private boolean generateExtendedDataPerCheck = false;
 	private SchemaName outputSchema;
@@ -71,47 +88,91 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
 
-	public BimBotsOutput runBimBot(BimBotsInput input, BimBotContext bimBotContext, SObjectType settings) throws BimBotsException {
+	public BimBotsOutput runBimBot(BimBotsInput input, BimBotContext bimBotContext, PluginConfiguration pluginConfiguration) throws BimBotsException {
 		try {
 			IfcModelInterface model = input.getIfcModel();
 
-			PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
-
-			String language = pluginConfiguration.getString("LANGUAGE");
-
-			String filename = language.toLowerCase() + ".properties";
-			Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
-			Properties properties = new Properties();
-			properties.load(Files.newInputStream(propertiesFile));
-
-			CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
-
-			IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
-			IssueContainer issueContainer = new IssueContainer();
-			for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
-				for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
-					String fullIdentifier = groupIdentifier + "___" + identifier;
-					IssueContainer issueContainerGroup = new IssueContainer();
-					if (pluginConfiguration.has(fullIdentifier)) {
-						if (pluginConfiguration.getBoolean(fullIdentifier)) {
-							ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-							modelCheck.check(model, issueContainerGroup, checkerContext);
-						}
-					}
-					issueContainer.add(issueContainerGroup);
-				}
-			}
-
-			BimBotsOutput bimBotsOutput = new BimBotsOutput(SchemaName.valueOf(getName()), issueContainerSerializer.getBytes(issueContainer));
+			BimBotsOutput bimBotsOutput = new BimBotsOutput(SchemaName.valueOf(getName()), process(model, pluginConfiguration, bimBotContext.getCurrentUser()));
 			bimBotsOutput.setContentType(getContentType());
 			bimBotsOutput.setContentDisposition(getFileName());
 			bimBotsOutput.setTitle("IFC Validator");
 			return bimBotsOutput;
-		} catch (IOException e) {
-			throw new BimBotsException(e);
 		} catch (IssueException e) {
 			throw new BimBotsException(e);
+		} catch (IOException e) {
+			throw new BimBotsException(e);
 		}
+	}
+
+	public byte[] process(IfcModelInterface model, PluginConfiguration pluginConfiguration, String currentUser) throws IssueException, IOException {
+		String language = pluginConfiguration.getString("LANGUAGE");
+
+		String filename = language.toLowerCase() + ".properties";
+		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
+		Properties properties = new Properties();
+		try (InputStream newInputStream = Files.newInputStream(propertiesFile)) {
+			properties.load(newInputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath(), currentUser);
+		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
+		
+		ValidationMetaData validationMetaData = new ValidationMetaData();
+		RootIssueContainer issueContainer = new RootIssueContainer();
+		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
+			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
+				String fullIdentifier = groupIdentifier + "___" + identifier;
+				IssueContainer issueContainerGroup = new IssueContainer();
+				if (pluginConfiguration.has(fullIdentifier)) {
+					if (pluginConfiguration.getBoolean(fullIdentifier)) {
+						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
+						modelCheck.check(model, issueContainerGroup, checkerContext);
+					}
+				}
+				issueContainer.add(issueContainerGroup);
+			}
+		}
+
+//		issueContainer.dumpSummary();
+		
+		IfcHeader ifcHeader = model.getModelMetaData().getIfcHeader();
+		if (ifcHeader != null) {
+			if (ifcHeader.getTimeStamp() != null) {
+				validationMetaData.setFileDate(dateToXMLGregorianCalendar(ifcHeader.getTimeStamp(), TimeZone.getDefault()));
+			}
+			validationMetaData.setFileName(ifcHeader.getFilename());
+		}
+		validationMetaData.setRemoteReference(getPluginContext().getBasicServerInfo().getSiteAddress());
+
+		List<IdEObject> projects = model.getAll(model.getPackageMetaData().getEClass("IfcProject"));
+		if (projects.size() == 1) {
+			IdEObject ifcProject = projects.get(0);
+			validationMetaData.setIfcProject(ifcProject);
+		} else if (projects.isEmpty()) {
+			LOGGER.info("No IfcProjects");
+		} else {
+			LOGGER.info("Too many IfcProjects");
+		}
+
+		issueContainer.setValidationMetaData(validationMetaData);
+		return issueContainerSerializer.getBytes(issueContainer);
+	}
+	
+	public static XMLGregorianCalendar dateToXMLGregorianCalendar(Date date, TimeZone zone) {
+		XMLGregorianCalendar xmlGregorianCalendar = null;
+		GregorianCalendar gregorianCalendar = new GregorianCalendar();
+		gregorianCalendar.setTime(date);
+		gregorianCalendar.setTimeZone(zone);
+		try {
+			DatatypeFactory dataTypeFactory = DatatypeFactory.newInstance();
+			xmlGregorianCalendar = dataTypeFactory.newXMLGregorianCalendar(gregorianCalendar);
+		} catch (Exception e) {
+			System.out.println("Exception in conversion of Date to XMLGregorianCalendar" + e);
+		}
+
+		return xmlGregorianCalendar;
 	}
 
 	@Override
@@ -121,44 +182,8 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		SProject project = bimServerClientInterface.getServiceInterface().getProjectByPoid(poid);
 		IfcModelInterface model = bimServerClientInterface.getModel(project, roid, true, false, true);
 
-		PluginConfiguration pluginConfiguration = new PluginConfiguration(settings);
-
-		String language = pluginConfiguration.getString("LANGUAGE");
-
-		String filename = language.toLowerCase() + ".properties";
-		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
-		Properties properties = new Properties();
-		properties.load(Files.newInputStream(propertiesFile));
-
-		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
-
-		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
-		IssueContainer issueContainer = new IssueContainer();
-		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
-//			boolean headerAdded = false;
-			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
-				String fullIdentifier = groupIdentifier + "___" + identifier;
-				if (pluginConfiguration.has(fullIdentifier)) {
-					if (pluginConfiguration.getBoolean(fullIdentifier)) {
-						// if (!generateExtendedDataPerCheck && !headerAdded) {
-						// issueContainerSerializer.addHeader(translator.translate(groupIdentifier
-						// + "_HEADER"));
-						// }
-						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
-						modelCheck.check(model, issueContainer, checkerContext);
-					}
-				}
-			}
-			if (generateExtendedDataPerCheck) {
-				addExtendedData(issueContainerSerializer.getBytes(issueContainer), getFileName(), groupIdentifier, getContentType(), bimServerClientInterface, roid);
-				issueContainer = new IssueContainer();
-			}
-		}
-
-		// issueContainerSerializer.validate();
-
 		if (!generateExtendedDataPerCheck) {
-			addExtendedData(issueContainerSerializer.getBytes(issueContainer), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
+			addExtendedData(process(model, new PluginConfiguration(settings), runningService.getCurrentUser()), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
 		}
 
 		runningService.updateProgress(100);
@@ -204,7 +229,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath());
+		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath(), null);
 
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
@@ -223,19 +248,34 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 		return objectDefinition;
 	}
-	
+
 	@Override
 	public Set<String> getAvailableOutputs() {
 		return Collections.singleton(outputSchema.name());
 	}
-	
+
 	@Override
 	public Set<String> getAvailableInputs() {
 		return Collections.singleton(SchemaName.IFC_STEP_2X3TC1.name());
 	}
-	
+
 	@Override
 	public boolean requiresGeometry() {
+		return true;
+	}
+
+	@Override
+	public boolean needsRawInput() {
+		return false;
+	}
+	
+	@Override
+	public Query getPreloadQuery(PackageMetaData packageMetaData) {
+		return null;
+	}
+
+	@Override
+	public boolean preloadCompleteModel() {
 		return false;
 	}
 }
