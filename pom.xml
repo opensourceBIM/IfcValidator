@@ -165,23 +165,23 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.114-SNAPSHOT</version>
+			<version>1.5.114</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>bcf</artifactId>
-			<version>0.0.34-SNAPSHOT</version>
+			<version>0.0.34</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>ifcplugins</artifactId>
-			<version>0.0.22</version>
+			<version>0.0.41</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
-			<version>1.5.114-SNAPSHOT</version>
+			<version>1.5.114</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
