@@ -67,14 +67,13 @@ public class BcfInterface implements IssueContainerSerializer {
 	
 	public Issue add(Type messageType, String type, String guid, Long oid, String message, Object is, String shouldBe, String author) throws IssueException {
 		if (messageType == Type.SUCCESS) {
-			// Not really uesful in a BCF, skip it
+			// Not really useful in a BCF, skip it
 			return null;
 		}
 		TopicFolder topicFolder = bcfFile.createTopicFolder();
 		Topic topic = topicFolder.createTopic();
 		topic.setTitle(message);
-		topic.setGuid(topicFolder.getUuid().toString());
-		topic.setTopicType(messageType.name());
+		topic.setTopicType(messageType == Type.ERROR ? "ISSUE" : "CANNOT_CHECK");
 		topic.setTopicStatus(messageType.toString());
 		topic.setCreationAuthor(author);
 		topicFolder.setDefaultSnapShotToDummy();

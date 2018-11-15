@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.bimserver.validationreport.Issue;
-import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueContainerSerializer;
 import org.bimserver.validationreport.RootIssueContainer;
 
