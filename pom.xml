@@ -171,7 +171,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.114</version>
+			<version>1.5.115</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
@@ -187,7 +187,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
-			<version>1.5.114</version>
+			<version>1.5.115</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

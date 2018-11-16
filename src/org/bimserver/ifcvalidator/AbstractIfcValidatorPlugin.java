@@ -33,6 +33,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.bimserver.bimbots.BimBotContext;
+import org.bimserver.bimbots.BimBotDefaultErrorCode;
+import org.bimserver.bimbots.BimBotErrorCode;
 import org.bimserver.bimbots.BimBotsException;
 import org.bimserver.bimbots.BimBotsInput;
 import org.bimserver.bimbots.BimBotsOutput;
@@ -98,9 +100,9 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 			bimBotsOutput.setTitle("IFC Validator");
 			return bimBotsOutput;
 		} catch (IssueException e) {
-			throw new BimBotsException(e);
+			throw new BimBotsException(e, IfcValidatorErrorCodes.ISSUE_EXCEPTION);
 		} catch (IOException e) {
-			throw new BimBotsException(e);
+			throw new BimBotsException(e, IfcValidatorErrorCodes.IO_EXCEPTION);
 		}
 	}
 
