@@ -227,9 +227,11 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		Path propertiesFile = getPluginContext().getRootPath().resolve(filename);
 		Properties properties = new Properties();
 		try {
-			properties.load(Files.newInputStream(propertiesFile));
+			try (InputStream newInputStream = Files.newInputStream(propertiesFile)) {
+				properties.load(newInputStream);
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		CheckerContext checkerContext = new CheckerContext(filename, properties, getPluginContext().getRootPath(), null);
 
