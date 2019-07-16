@@ -187,7 +187,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>tests</artifactId>
-			<version>1.5.115</version>
+			<version>1.5.156-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

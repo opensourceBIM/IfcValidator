@@ -120,11 +120,12 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 		IssueContainerSerializer issueContainerSerializer = createIssueInterface(checkerContext);
 		
 		ValidationMetaData validationMetaData = new ValidationMetaData();
-		RootIssueContainer issueContainer = new RootIssueContainer();
+		RootIssueContainer issueContainer = new RootIssueContainer("ROOT");
 		for (String groupIdentifier : modelCheckerRegistry.getGroupIdentifiers()) {
 			for (String identifier : modelCheckerRegistry.getIdentifiers(groupIdentifier)) {
 				String fullIdentifier = groupIdentifier + "___" + identifier;
 				IssueContainer issueContainerGroup = new IssueContainer();
+				issueContainerGroup.setTitle(fullIdentifier);
 				if (pluginConfiguration.has(fullIdentifier)) {
 					if (pluginConfiguration.getBoolean(fullIdentifier)) {
 						ModelCheck modelCheck = modelCheckerRegistry.getModelCheck(groupIdentifier, identifier);
@@ -278,6 +279,6 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	@Override
 	public boolean preloadCompleteModel() {
-		return false;
+		return true;
 	}
 }

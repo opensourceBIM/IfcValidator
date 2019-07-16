@@ -24,4 +24,10 @@
 		<name>IFC Validator (Excel)</name>
 		<description>Validates IFC models according to user defined settings, output as Excel</description>
 	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifcvalidator.NewChecksValidatorPlugin</implementationClass>
+		<name>IFC Validator (New checks)</name>
+		<description>Validates IFC models according to new checks</description>
+	</JavaPlugin>
 </PluginDescriptor>
