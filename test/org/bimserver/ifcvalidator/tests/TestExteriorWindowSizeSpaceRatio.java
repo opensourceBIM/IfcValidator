@@ -24,6 +24,7 @@ import org.bimserver.ifcvalidator.Tester;
 import org.bimserver.interfaces.objects.SDeserializerPluginConfiguration;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.plugins.services.BimServerClientInterface;
+import org.bimserver.plugins.services.CheckinProgressHandler;
 import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
@@ -44,7 +45,11 @@ public class TestExteriorWindowSizeSpaceRatio extends TestWithEmbeddedServer {
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 
 			// Checkin the file
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, new URL("https://github.com/opensourceBIM/TestFiles/raw/master/TestData/data/AC11-Institute-Var-2-IFC.ifc"));
+			client.checkin(newProject.getOid(), "test", deserializer.getOid(), new URL("https://github.com/opensourceBIM/TestFiles/raw/master/TestData/data/AC11-Institute-Var-2-IFC.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 
 			// Refresh project info
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());

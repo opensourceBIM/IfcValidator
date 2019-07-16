@@ -24,6 +24,7 @@ import org.bimserver.ifcvalidator.Tester;
 import org.bimserver.interfaces.objects.SDeserializerPluginConfiguration;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.plugins.services.BimServerClientInterface;
+import org.bimserver.plugins.services.CheckinProgressHandler;
 import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
@@ -39,7 +40,11 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_fail_tooFew.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_fail_tooFew.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
@@ -60,7 +65,11 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_fail_tooSmall.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_fail_tooSmall.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			
@@ -81,7 +90,11 @@ public class TestCarparkAccessibility extends TestWithEmbeddedServer {
 			BimServerClientInterface client = AllTests.getFactory().create(new UsernamePasswordAuthenticationInfo("admin@bimserver.org", "admin"));
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_pass.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("D:\\Dropbox\\Shared\\Singapore Code Compliance Share\\09_b_02_pass.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			IfcModelInterface model = client.getModel(newProject, newProject.getLastRevisionId(), true, false, true);
 			

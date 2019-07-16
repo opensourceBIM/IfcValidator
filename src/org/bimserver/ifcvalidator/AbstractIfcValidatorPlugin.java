@@ -33,8 +33,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.bimserver.bimbots.BimBotContext;
-import org.bimserver.bimbots.BimBotDefaultErrorCode;
-import org.bimserver.bimbots.BimBotErrorCode;
 import org.bimserver.bimbots.BimBotsException;
 import org.bimserver.bimbots.BimBotsInput;
 import org.bimserver.bimbots.BimBotsOutput;
@@ -84,8 +82,8 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	}
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
-		super.init(pluginContext);
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
+		super.init(pluginContext, systemSettings);
 	}
 
 	protected abstract IssueContainerSerializer createIssueInterface(CheckerContext translator);
@@ -196,7 +194,7 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 	public abstract String getFileName();
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
 		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
 
 		PrimitiveDefinition booleanType = StoreFactory.eINSTANCE.createPrimitiveDefinition();

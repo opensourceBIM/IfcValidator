@@ -24,6 +24,7 @@ import org.bimserver.ifcvalidator.Tester;
 import org.bimserver.interfaces.objects.SDeserializerPluginConfiguration;
 import org.bimserver.interfaces.objects.SProject;
 import org.bimserver.plugins.services.BimServerClientInterface;
+import org.bimserver.plugins.services.CheckinProgressHandler;
 import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.UsernamePasswordAuthenticationInfo;
 import org.bimserver.test.AllTests;
@@ -39,7 +40,11 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("C:\\Git\\BIMserver\\TestData\\data\\AC11-Institute-Var-2-IFC - Removed Space.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("C:\\Git\\BIMserver\\TestData\\data\\AC11-Institute-Var-2-IFC - Removed Space.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			
@@ -60,7 +65,11 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("D:\\anon.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("D:\\anon.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			
@@ -83,7 +92,11 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_fail_noSpace.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("testfiles/09_d_fail_noSpace.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			
@@ -105,7 +118,11 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 			
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_fail_smallSpace.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("testfiles/09_d_fail_smallSpace.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 			
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			
@@ -127,7 +144,11 @@ public class TestUnidentifiedSpaces extends TestWithEmbeddedServer {
 			SProject newProject = client.getServiceInterface().addProject("test" + Math.random(), "ifc2x3tc1");
 			SDeserializerPluginConfiguration deserializer = client.getServiceInterface().getSuggestedDeserializerForExtension("ifc", newProject.getOid());
 			
-			client.checkin(newProject.getOid(), "test", deserializer.getOid(), false, Flow.SYNC, Paths.get("testfiles/09_d_pass.ifc"));
+			client.checkinSync(newProject.getOid(), "test", deserializer.getOid(), Paths.get("testfiles/09_d_pass.ifc"), new CheckinProgressHandler() {
+				@Override
+				public void progress(String title, int progress) {
+				}
+			});
 			
 			newProject = client.getServiceInterface().getProjectByPoid(newProject.getOid());
 			
