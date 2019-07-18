@@ -1,20 +1,17 @@
 package org.bimserver.ifcvalidator.checks;
 
-import java.awt.Rectangle;
 import java.awt.geom.Area;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.CheckerContext;
-import org.bimserver.models.geometry.Bounds;
 import org.bimserver.models.geometry.GeometryInfo;
 import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
-import org.bimserver.models.ifc2x3tc1.IfcSlab;
+import org.bimserver.models.ifc2x3tc1.IfcSpace;
 import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
@@ -33,50 +30,70 @@ public class MaximumGroundArea extends ModelCheck {
 
 	@Override
 	public void check(IfcModelInterface model, IssueContainer issueContainer, CheckerContext checkerContext) throws IssueException {
-		// TODO use only products that are on the ground level (building storey)
-		// TODO use a more precise area than boundsMm
-		
 		Area area = new Area();
 		
-		Set<IfcBuildingStorey> stories = new TreeSet<>(new Comparator<IfcBuildingStorey>() {
-			@Override
-			public int compare(IfcBuildingStorey o1, IfcBuildingStorey o2) {
-				return Double.compare(o1.getElevation(), o2.getElevation());
-			}});
+		Set<IfcBuildingStorey> groundLevelStoreys = new HashSet<>();
 		
-		stories.addAll(model.getAll(IfcBuildingStorey.class));
-		
-		IfcBuildingStorey groundLevel = null;
-		
-		for (IfcBuildingStorey ifcBuildingStorey : stories) {
-			if (ifcBuildingStorey.getElevation() >= 0) {
-				// This must be ground level
-				groundLevel = ifcBuildingStorey;
-				break;
+		for (IfcBuildingStorey ifcBuildingStorey : model.getAll(IfcBuildingStorey.class)) {
+			if (ifcBuildingStorey.getElevation() >= 0 && ifcBuildingStorey.getElevation() < 0.5) {
+				groundLevelStoreys.add(ifcBuildingStorey);
 			}
 		}
 		
-		if (groundLevel == null) {
-			issueContainer.builder().message("No groundlevel found in model").type(Type.ERROR).add();
+		if (groundLevelStoreys.isEmpty()) {
+			issueContainer.builder().message("No groundlevel(s) found in model").type(Type.ERROR).add();
 			return;
 		}
-		
-		for (IfcProduct ifcProduct : IfcUtils.getDecompositionAndContainmentRecursive(groundLevel)) {
-			if (ifcProduct instanceof IfcSite) {
-				continue;
+
+		TreeMap<Double, IfcProduct> areas = new TreeMap<>();
+		float lengthUnitPrefix = IfcUtils.getLengthUnitPrefix(model) * 1000;
+		IfcTools2D ifcTools2D = new IfcTools2D();
+
+		for (IfcBuildingStorey ifcBuildingStorey : groundLevelStoreys) {
+			for (IfcProduct ifcProduct : IfcUtils.getDecompositionAndContainmentRecursive(ifcBuildingStorey)) {
+				if (ifcProduct instanceof IfcSite || ifcProduct instanceof IfcSpace) {
+					continue;
+				}
+				GeometryInfo geometryInfo = ifcProduct.getGeometry();
+				if (geometryInfo == null) {
+					continue;
+				}
+				
+				Area newArea = ifcTools2D.get2D(ifcProduct, lengthUnitPrefix);
+				
+				// Old code, using the aabb
+//				Bounds boundsMm = geometryInfo.getBoundsMm();
+//				Rectangle rectangle = new Rectangle((int)boundsMm.getMin().getX(), (int)boundsMm.getMin().getY(), (int)(boundsMm.getMax().getX() - boundsMm.getMin().getX()), (int)(boundsMm.getMax().getY() - boundsMm.getMin().getY()));
+//				Area newArea = new Area(rectangle);
+
+				float areaM2 = IfcTools2D.getArea(newArea) / 1000000;
+				
+				if (Float.isNaN(areaM2) || Float.isInfinite(areaM2)) {
+					// Skip
+				} else {
+					areas.put((double) areaM2, ifcProduct);
+					area.add(newArea);
+				}
 			}
-			GeometryInfo geometryInfo = ifcProduct.getGeometry();
-			if (geometryInfo == null) {
-				continue;
-			}
-			Bounds boundsMm = geometryInfo.getBoundsMm();
-			Area newArea = new Area(new Rectangle((int)boundsMm.getMin().getX(), (int)boundsMm.getMin().getY(), (int)(boundsMm.getMax().getX() - boundsMm.getMin().getX()), (int)(boundsMm.getMax().getY() - boundsMm.getMin().getY())));
-			area.add(newArea);
 		}
 
+//		Entry<Double, IfcProduct> last = areas.lastEntry();
+//		System.out.println("Biggest 10");
+//		for (int i=0; i<10; i++) {
+//			System.out.println(last.getKey() + " " + last.getValue().eClass().getName() + " - " + last.getValue().getName());
+//			last = areas.lowerEntry(last.getKey());
+//		}
+//		System.out.println();
+//		System.out.println("Smallest 10");
+//		last = areas.firstEntry();
+//		for (int i=0; i<10; i++) {
+//			System.out.println(last.getKey() + " " + last.getValue().eClass().getName() + " - " + last.getValue().getName());
+//			last = areas.higherEntry(last.getKey());
+//		}
+//
 		float areaM2 = IfcTools2D.getArea(area) / 1000000;
-		
-//		new Display("test", 1024, 768, area);
+		System.out.println("Area: " + areaM2 + "m2");
+		new Display("Area", 1024, 768, area);
 		
 		IssueBuilder builder = issueContainer.builder().is(areaM2 + "m2").shouldBe("<= " + MAX_GROUND_AREA_M2 + "m2");
 		if (areaM2 > MAX_GROUND_AREA_M2) {

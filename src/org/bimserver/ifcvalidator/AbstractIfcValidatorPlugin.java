@@ -178,13 +178,16 @@ public abstract class AbstractIfcValidatorPlugin extends AbstractAddExtendedData
 
 	@Override
 	public void newRevision(RunningService runningService, BimServerClientInterface bimServerClientInterface, long poid, long roid, String userToken, long soid, SObjectType settings) throws Exception {
+		super.newRevision(runningService, bimServerClientInterface, poid, roid, userToken, soid, settings);
 		runningService.updateProgress(0);
 
 		SProject project = bimServerClientInterface.getServiceInterface().getProjectByPoid(poid);
+		
 		IfcModelInterface model = bimServerClientInterface.getModel(project, roid, true, false, true);
 
+		byte[] process = process(model, new PluginConfiguration(settings), runningService.getCurrentUser());
 		if (!generateExtendedDataPerCheck) {
-			addExtendedData(process(model, new PluginConfiguration(settings), runningService.getCurrentUser()), getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
+			addExtendedData(process, getFileName(), "IFC Validator", getContentType(), bimServerClientInterface, roid);
 		}
 
 		runningService.updateProgress(100);
