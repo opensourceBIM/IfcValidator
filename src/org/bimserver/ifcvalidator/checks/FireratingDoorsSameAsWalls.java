@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifcvalidator.CheckerContext;
-import org.bimserver.models.ifc2x3tc1.IfcDoor;
 import org.bimserver.models.ifc2x3tc1.IfcElement;
 import org.bimserver.models.ifc2x3tc1.IfcFeatureElementSubtraction;
 import org.bimserver.models.ifc2x3tc1.IfcOpeningElement;
@@ -12,7 +11,6 @@ import org.bimserver.models.ifc2x3tc1.IfcRelFillsElement;
 import org.bimserver.models.ifc2x3tc1.IfcRelVoidsElement;
 import org.bimserver.models.ifc2x3tc1.IfcWall;
 import org.bimserver.utils.IfcUtils;
-import org.bimserver.validationreport.Issue;
 import org.bimserver.validationreport.IssueContainer;
 import org.bimserver.validationreport.IssueException;
 import org.bimserver.validationreport.Type;

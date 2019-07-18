@@ -12,7 +12,6 @@ import org.bimserver.models.ifc2x3tc1.IfcBuildingStorey;
 import org.bimserver.models.ifc2x3tc1.IfcProduct;
 import org.bimserver.models.ifc2x3tc1.IfcSite;
 import org.bimserver.models.ifc2x3tc1.IfcSpace;
-import org.bimserver.utils.Display;
 import org.bimserver.utils.IfcTools2D;
 import org.bimserver.utils.IfcUtils;
 import org.bimserver.validationreport.IssueBuilder;
@@ -92,8 +91,8 @@ public class MaximumGroundArea extends ModelCheck {
 //		}
 //
 		float areaM2 = IfcTools2D.getArea(area) / 1000000;
-		System.out.println("Area: " + areaM2 + "m2");
-		new Display("Area", 1024, 768, area);
+//		System.out.println("Area: " + areaM2 + "m2");
+//		new Display("Area", 1024, 768, area);
 		
 		IssueBuilder builder = issueContainer.builder().is(areaM2 + "m2").shouldBe("<= " + MAX_GROUND_AREA_M2 + "m2");
 		if (areaM2 > MAX_GROUND_AREA_M2) {
