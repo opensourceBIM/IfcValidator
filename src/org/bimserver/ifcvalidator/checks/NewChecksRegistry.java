@@ -19,6 +19,7 @@ package org.bimserver.ifcvalidator.checks;
 
 public class NewChecksRegistry extends ModelCheckerRegistry {
 	public NewChecksRegistry() {
+		addCheck(new FacadeMaterial());
 		addCheck(new MaxBuildingHeightAboveGroundLevel());
 		addCheck(new MaximumGroundArea());
 		addCheck(new MaximumNumberOfStoreysAboveGround());
