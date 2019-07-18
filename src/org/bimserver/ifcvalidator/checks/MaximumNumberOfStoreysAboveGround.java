@@ -24,9 +24,9 @@ public class MaximumNumberOfStoreysAboveGround extends ModelCheck {
 			}
 		}
 		if (storeysAboveGroundLevel > MAX_ABOVE_GROUND) {
-			issueContainer.builder().is(storeysAboveGroundLevel).shouldBe("< " + MAX_ABOVE_GROUND).message("Too many building storeys above ground level").type(Type.ERROR).add();
+			issueContainer.builder().is(storeysAboveGroundLevel).shouldBe("<= " + MAX_ABOVE_GROUND).message("Too many building storeys above ground level").type(Type.ERROR).add();
 		} else {
-			issueContainer.builder().is(storeysAboveGroundLevel).shouldBe("< " + MAX_ABOVE_GROUND).message("Correct amount of building storeys above ground level").type(Type.SUCCESS).add();
+			issueContainer.builder().is(storeysAboveGroundLevel).shouldBe("<= " + MAX_ABOVE_GROUND).message("Correct amount of building storeys above ground level").type(Type.SUCCESS).add();
 		}
 	}
 }
