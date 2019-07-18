@@ -12,7 +12,7 @@ import org.bimserver.validationreport.Type;
 
 public class CompletelyInBoundingBox extends ModelCheck {
 
-	private static final double[] BOUNDS_MM = new double[] {-2500, -2500, -2500, 2500, 2500, 2500};
+	private static final double[] BOUNDS_MM = new double[] {-5000, -7500, -2500, 5000, 7500, 2500};
 
 	public CompletelyInBoundingBox() {
 		super("LOCATION", "IN_BOUNDING_BOX");
