@@ -17,7 +17,7 @@ import org.bimserver.validationreport.Type;
 public class MaxBuildingHeightAboveGroundLevel extends ModelCheck {
 
 	// TODO make this a setting
-	private static final double MAX_HEIGHT_ABOVE_GROUND_LEVEL_MM = 10000d;
+	private static final double MAX_HEIGHT_ABOVE_GROUND_LEVEL_MM = 18000d;
 	
 	public MaxBuildingHeightAboveGroundLevel() {
 		super("BUILDING", "MAX_HEIGHT_ABOVE_GROUND_LEVEL");
