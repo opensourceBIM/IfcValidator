@@ -12,7 +12,7 @@ import org.bimserver.validationreport.Type;
 public class MinimalDoorWidth extends ModelCheck {
 
 	// For now this is a fixed width, should become a setting
-	private static final float MINIMAL_WIDTH_MM = 1100;
+	private static final float MINIMAL_WIDTH_MM = 990;
 	
 	public MinimalDoorWidth() {
 		super("SPACING", "MINIMAL_DOOR_WIDTH");
