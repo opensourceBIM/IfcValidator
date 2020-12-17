@@ -17,7 +17,7 @@ For now, this plugin only implements checks that can be done with only the IFC f
 A list of checks that have been identified by asking people from the building industry and reading Dutch "norm" documents that seem computer checkable.
 
 | Check | Implemented | Part of |
-| ------------- | ------------- | ----- | ------ | 
+| ------------- | ------------- | ----- |
 | Exactly 1 IfcProject | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
 | IfcProject has at least one representation where the TrueNorth attribute has been set | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
 | IfcProject has a length unit set | ![](https://github.com/opensourceBIM/IfcValidator/blob/master/docs/img/accept.png) | RVB_BIM_Norm 1.1 |
